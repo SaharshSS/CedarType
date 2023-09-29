@@ -458,3 +458,86 @@ textarea::placeholder {
     flex-direction: column;
   }
 }
+
+/* Creates the positioning context for the textarea and spellcheck overlay. */
+.editor-input-wrapper {
+  position: relative;
+  width: 100%;
+  min-height: 300px;
+}
+
+/* Places the dictionary highlighting beneath the actual textarea. */
+.spellcheck-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: normal;
+  pointer-events: none;
+
+  padding: 24px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 25px;
+  line-height: 1.65;
+
+  color: #17332c;
+}
+
+/* Keeps the actual textarea above the spellcheck overlay. */
+.editor-input-wrapper textarea {
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+  min-height: 300px;
+
+  background: transparent;
+  /* Text is drawn by .spellcheck-layer; textarea only captures input. */
+  color: transparent;
+  caret-color: #17332c;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Draws the red wavy underline beneath words absent from the dictionary. */
+.misspelled {
+  text-decoration-line: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: #dc2626;
+  text-decoration-thickness: 1.5px;
+}
+
+/* Indicates that every word was found in the current dictionary. */
+.spellcheck-ok {
+  color: #15803d;
+}
+
+/* Indicates that one or more words were not found in the dictionary. */
+.spellcheck-warning {
+  color: #dc2626;
+}
+
+/* Centers the cedar tree inside the CedarType brand mark. */
+.brand-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 46px;
+  height: 46px;
+
+  flex-shrink: 0;
+}
+
+/* Controls the size of the cedar tree SVG. */
+.brand-mark svg {
+  width: 38px;
+  height: 38px;
+}
+
+/* Prevents the spellcheck overlay from visually interfering with the editor. */
+.spellcheck-layer span {
+  pointer-events: none;
+}
+

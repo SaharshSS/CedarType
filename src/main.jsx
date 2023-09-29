@@ -1,617 +1,595 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  Fragment,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
+
 import { createRoot } from "react-dom/client";
+
 import "./styles.css";
 
 /*
  * Defines the language and orthography profiles used by CedarType.
  *
- * IMPORTANT:
- * - Orthographies are kept separate when a language has multiple documented systems.
- * - `chars` contains orthographic characters and useful multi-character sequences.
- * - `mappings` provides optional ASCII-friendly input shortcuts.
- * - Linguistic/IPA symbols are only included when they are actually useful for
- *   the selected orthography or documented transcription system.
+ * Orthographies are kept separate when a language has multiple documented
+ * writing systems. The dictionary belongs to the language rather than to an
+ * individual orthography unless an orthography-specific dictionary is needed.
+ *
+ * Each orthography defines regularLatin (A–Z typable sequences, including
+ * digraphs) and special (Unicode letters, diacritics, and symbols).
  */
 const LANGUAGE_PROFILES = {
-
-  "Lushootseed": {
+  Lushootseed: {
     code: "lut",
 
-    orthographies: {
+    /*
+     * Placeholder lexical data for development.
+     *
+     * Replace this with the actual Lushootseed dictionary data you are
+     * permitted to use.
+     */
+    dictionary: [
+      "šəq̓ʷ",
+      "ʔəs",
+      "x̌ʷəl",
+      "siʔsiʔab"
+    ],
 
+    orthographies: {
       "Lushootseed Dictionary": {
         note:
           "Lushootseed Dictionary / Vi Hilbert orthography. Based on the orthography developed by Vi Hilbert and other Lushootseed language specialists.",
 
-        chars: [
+        regularLatin: [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e",
+          "f",
+          "g",
+          "h",
+          "i",
+          "j",
+          "k",
+          "l",
+          "m",
+          "n",
+          "o",
+          "p",
+          "q",
+          "r",
+          "s",
+          "t",
+          "u",
+          "v",
+          "w",
+          "x",
+          "y",
+          "z"
+        ],
+
+        special: [
           "ʔ",
           "ə",
-
           "š",
           "č",
           "ǰ",
-
           "ł",
           "ƛ",
-
           "b̓",
           "c̓",
           "č̓",
           "dᶻ",
-
           "gʷ",
-
           "k̓",
           "kʷ",
           "k̓ʷ",
-
           "l̓",
           "m̓",
           "n̓",
-
           "p̓",
-
           "q̓",
           "qʷ",
           "q̓ʷ",
-
           "s̓",
           "t̓",
-
           "w̓",
           "xʷ",
           "x̌",
           "x̌ʷ",
-
           "y̓"
         ],
 
         mappings: {
-
-          "sh": "š",
-          "ch": "č",
-          "j": "ǰ",
-
-          "dz": "dᶻ",
-
-          "tl": "ƛ",
-
+          sh: "š",
+          ch: "č",
+          j: "ǰ",
+          dz: "dᶻ",
+          tl: "ƛ",
           "b'": "b̓",
           "c'": "c̓",
           "ch'": "č̓",
-
           "k'": "k̓",
-          "kw": "kʷ",
+          kw: "kʷ",
           "kw'": "k̓ʷ",
-
           "l'": "l̓",
           "m'": "m̓",
           "n'": "n̓",
-
           "p'": "p̓",
-
           "q'": "q̓",
-          "qw": "qʷ",
+          qw: "qʷ",
           "qw'": "q̓ʷ",
-
           "s'": "s̓",
           "t'": "t̓",
-
           "w'": "w̓",
-
-          "xw": "xʷ",
-          "xv": "x̌",
+          xw: "xʷ",
+          xv: "x̌",
           "x̌w": "x̌ʷ",
-
           "y'": "y̓",
-
           "'": "ʔ"
         }
       }
     }
   },
 
-
   "Chinuk Wawa": {
     code: "chn",
 
-    orthographies: {
+    /*
+     * Placeholder lexical data for development.
+     *
+     * Replace this with an appropriate Chinuk Wawa dictionary.
+     */
+    dictionary: [
+      "hayu",
+      "klahowya",
+      "tənəs",
+      "skookum"
+    ],
 
+    orthographies: {
       "Grand Ronde": {
         note:
           "Grand Ronde Chinuk Wawa orthography. This is the modern revitalized orthography associated with the Confederated Tribes of Grand Ronde.",
 
-        chars: [
-
+        regularLatin: [
           "a",
           "e",
-          "ə",
           "i",
           "o",
           "u",
+          "p",
+          "t",
+          "k",
+          "kw",
+          "q",
+          "qw",
+          "ts",
+          "ch",
+          "l",
+          "s",
+          "sh",
+          "x",
+          "xw",
+          "h",
+          "m",
+          "n",
+          "w",
+          "y"
+        ],
 
+        special: [
+          "ə",
           "á",
           "é",
           "í",
           "ó",
           "ú",
-
-          "p",
           "pʰ",
           "p̓",
-
-          "t",
           "tʰ",
           "t̓",
-
-          "k",
           "kʰ",
           "k̓",
-
-          "kw",
           "kʰw",
           "k̓w",
-
-          "q",
           "qʰ",
           "q̓",
-
-          "qw",
           "qʰw",
           "q̓w",
-
-          "ts",
           "t̓s",
-
-          "ch",
           "c̓h",
-
           "tɬ",
           "t̓ɬ",
-
-          "l",
           "ɬ",
-
-          "s",
-          "sh",
-
-          "x",
-          "xw",
-
           "x̣",
           "x̣w",
-
-          "h",
-          "m",
-          "n",
-          "w",
-          "y",
-
           "ʔ"
         ],
 
         mappings: {
-
-          "ph": "pʰ",
+          ph: "pʰ",
           "p'": "p̓",
-
-          "th": "tʰ",
+          th: "tʰ",
           "t'": "t̓",
-
-          "kh": "kʰ",
+          kh: "kʰ",
           "k'": "k̓",
-
-          "khw": "kʰw",
+          khw: "kʰw",
           "kw'": "k̓w",
-
-          "qh": "qʰ",
+          qh: "qʰ",
           "q'": "q̓",
-
-          "qhw": "qʰw",
+          qhw: "qʰw",
           "qw'": "q̓w",
-
           "ts'": "t̓s",
-
           "ch'": "c̓h",
-
-          "tl": "tɬ",
+          tl: "tɬ",
           "tl'": "t̓ɬ",
-
-          "lh": "ɬ",
-
+          lh: "ɬ",
           "x.": "x̣",
           "x.w": "x̣w",
-
           "'": "ʔ"
         }
       },
-
 
       "Historical / Linguistic": {
         note:
           "Broader Latin transcription support for historical and linguistic work on Chinuk Wawa. This is intentionally separate from the Grand Ronde practical orthography.",
 
-        chars: [
+        regularLatin: [
+          "a",
+          "e",
+          "i",
+          "o",
+          "u",
+          "p",
+          "t",
+          "k",
+          "kw",
+          "q",
+          "qw",
+          "ts",
+          "ch",
+          "l",
+          "s",
+          "sh",
+          "x",
+          "xw",
+          "h",
+          "m",
+          "n",
+          "w",
+          "y"
+        ],
 
+        special: [
           "ə",
           "æ",
-
           "pʰ",
           "p̓",
-
           "tʰ",
           "t̓",
-
           "kʰ",
           "k̓",
           "kʰw",
           "k̓w",
-
           "qʰ",
           "q̓",
           "qʰw",
           "q̓w",
-
           "tɬ",
           "t̓ɬ",
-
           "ɬ",
-
-          "sh",
-          "x",
-          "xw",
           "x̣",
           "x̣w",
-
           "ʔ",
-
           "á",
           "é",
           "í",
           "ó",
           "ú",
-
           "·",
           "′"
         ],
 
         mappings: {
-
-          "ph": "pʰ",
+          ph: "pʰ",
           "p'": "p̓",
-
-          "th": "tʰ",
+          th: "tʰ",
           "t'": "t̓",
-
-          "kh": "kʰ",
+          kh: "kʰ",
           "k'": "k̓",
-
-          "khw": "kʰw",
+          khw: "kʰw",
           "kw'": "k̓w",
-
-          "qh": "qʰ",
+          qh: "qʰ",
           "q'": "q̓",
-
-          "qhw": "qʰw",
+          qhw: "qʰw",
           "qw'": "q̓w",
-
-          "tl": "tɬ",
+          tl: "tɬ",
           "tl'": "t̓ɬ",
-
-          "lh": "ɬ",
-
+          lh: "ɬ",
           "x.": "x̣",
           "x.w": "x̣w",
-
           "'": "ʔ"
         }
       }
     }
   },
 
-
-  "Tlingit": {
+  Tlingit: {
     code: "tli",
 
-    orthographies: {
+    /*
+     * Placeholder lexical data for development.
+     *
+     * Replace this with the actual Tlingit dictionary data.
+     */
+    dictionary: [
+      "gunalchéesh",
+      "yakʼéixʼ",
+      "áwé",
+      "haa"
+    ],
 
+    orthographies: {
       "Revised Popular": {
         note:
           "Tlingit Revised Popular orthography. Uvulars are represented with combining underscore marks.",
 
-        chars: [
+        regularLatin: [
+          "aa",
+          "ee",
+          "ii",
+          "oo",
+          "uu"
+        ],
 
+        special: [
           "á",
           "é",
           "í",
           "ó",
           "ú",
-
           "à",
           "è",
           "ì",
           "ò",
           "ù",
-
           "ḵ",
           "ḵʼ",
           "ḵw",
           "ḵʼw",
-
           "g̱",
           "g̱w",
-
           "x̱",
           "x̱ʼ",
           "x̱w",
           "x̱ʼw",
-
           "kʼ",
           "kʼw",
           "sʼ",
           "tʼ",
-
           "tlʼ",
           "tsʼ",
-
           "xʼ",
           "xʼw",
-
           "lʼ",
-
           "ł",
-
           "ÿ",
-
-          "aa",
           "áa",
           "àa",
-
-          "ee",
           "ée",
           "èe",
-
-          "ii",
           "íi",
           "ìi",
-
-          "oo",
           "óo",
           "òo",
-
-          "uu",
           "úu",
           "ùu",
-
           "ʼ"
         ],
 
         mappings: {
-
-          "kh": "ḵ",
+          kh: "ḵ",
           "kh'": "ḵʼ",
-          "khw": "ḵw",
+          khw: "ḵw",
           "kh'w": "ḵʼw",
-
-          "gh": "g̱",
-          "ghw": "g̱w",
-
-          "xh": "x̱",
+          gh: "g̱",
+          ghw: "g̱w",
+          xh: "x̱",
           "xh'": "x̱ʼ",
-          "xhw": "x̱w",
+          xhw: "x̱w",
           "xh'w": "x̱ʼw",
-
           "k'": "kʼ",
           "k'w": "kʼw",
-
           "s'": "sʼ",
           "t'": "tʼ",
-
           "tl'": "tlʼ",
           "ts'": "tsʼ",
-
           "x'": "xʼ",
           "x'w": "xʼw",
-
           "l'": "lʼ",
-
           "'": "ʼ"
         }
       },
 
-
-      "Canadian": {
+      Canadian: {
         note:
           "Canadian Tlingit orthography. Uvulars are represented using consonant+h sequences rather than the Revised Popular underscore convention.",
 
-        chars: [
+        regularLatin: [
+          "kh",
+          "khʼ",
+          "khw",
+          "khʼw",
+          "gh",
+          "ghw",
+          "xh",
+          "xhʼ",
+          "xhw",
+          "xhʼw",
+          "aa",
+          "ee",
+          "ii",
+          "oo",
+          "uu",
+          "l"
+        ],
 
+        special: [
           "á",
           "é",
           "í",
           "ó",
           "ú",
-
           "â",
           "ê",
           "î",
           "ô",
           "û",
-
           "à",
           "è",
           "ì",
           "ò",
           "ù",
-
-          "kh",
-          "khʼ",
-          "khw",
-          "khʼw",
-
-          "gh",
-          "ghw",
-
-          "xh",
-          "xhʼ",
-          "xhw",
-          "xhʼw",
-
           "kʼ",
           "kʼw",
           "sʼ",
           "tʼ",
-
           "tlʼ",
           "tsʼ",
-
-          "l",
           "ł",
-
           "xʼ",
           "xʼw",
-
-          "aa",
-          "ee",
-          "ii",
-          "oo",
-          "uu",
-
           "ʼ"
         ],
 
         mappings: {
-
           "kh'": "khʼ",
-          "khw": "khw",
+          khw: "khw",
           "kh'w": "khʼw",
-
-          "gh": "gh",
-          "ghw": "ghw",
-
+          gh: "gh",
+          ghw: "ghw",
           "xh'": "xhʼ",
-          "xhw": "xhw",
+          xhw: "xhw",
           "xh'w": "xhʼw",
-
           "k'": "kʼ",
           "k'w": "kʼw",
-
           "s'": "sʼ",
           "t'": "tʼ",
-
           "tl'": "tlʼ",
           "ts'": "tsʼ",
-
           "x'": "xʼ",
           "x'w": "xʼw",
-
           "'": "ʼ"
         }
       },
 
-
-      "Email": {
+      Email: {
         note:
           "Tlingit Email orthography. This preserves much of Revised Popular spelling while using consonant+h forms instead of underscore diacritics for uvulars.",
 
-        chars: [
+        regularLatin: [
+          "kh",
+          "khʼ",
+          "khw",
+          "khʼw",
+          "gh",
+          "ghw",
+          "xh",
+          "xhʼ",
+          "xhw",
+          "xhʼw",
+          "aa",
+          "ee",
+          "ii",
+          "oo",
+          "uu"
+        ],
 
+        special: [
           "á",
           "é",
           "í",
           "ó",
           "ú",
-
           "à",
           "è",
           "ì",
           "ò",
           "ù",
-
-          "kh",
-          "khʼ",
-          "khw",
-          "khʼw",
-
-          "gh",
-          "ghw",
-
-          "xh",
-          "xhʼ",
-          "xhw",
-          "xhʼw",
-
           "kʼ",
           "kʼw",
           "sʼ",
           "tʼ",
           "tlʼ",
           "tsʼ",
-
           "xʼ",
           "xʼw",
-
           "lʼ",
-
-          "aa",
           "áa",
-          "ee",
           "ée",
-          "ii",
           "íi",
-          "oo",
           "óo",
-          "uu",
           "úu",
-
           "ʼ"
         ],
 
         mappings: {
-
           "kh'": "khʼ",
-          "khw": "khw",
+          khw: "khw",
           "kh'w": "khʼw",
-
-          "gh": "gh",
-          "ghw": "ghw",
-
+          gh: "gh",
+          ghw: "ghw",
           "xh'": "xhʼ",
-          "xhw": "xhw",
+          xhw: "xhw",
           "xh'w": "xhʼw",
-
           "k'": "kʼ",
           "k'w": "kʼw",
-
           "s'": "sʼ",
           "t'": "tʼ",
-
           "tl'": "tlʼ",
           "ts'": "tsʼ",
-
           "x'": "xʼ",
           "x'w": "xʼw",
-
           "l'": "lʼ",
-
           "'": "ʼ"
         }
       }
     }
   },
 
-
-  "Haida": {
+  Haida: {
     code: "hai",
 
-    orthographies: {
+    /*
+     * Placeholder lexical data for development.
+     *
+     * Replace this with the actual Haida dictionary data.
+     */
+    dictionary: [
+      "Yáahl",
+      "háaw",
+      "ḵwáan",
+      "ʼWáadluu"
+    ],
 
-      "Enrico": {
+    orthographies: {
+      Enrico: {
         note:
           "Haida orthography associated with John Enrico. Haida tone may be represented with acute and grave accents.",
 
-        chars: [
+        regularLatin: [
+          "aa",
+          "ee",
+          "ii",
+          "oo",
+          "uu"
+        ],
 
+        special: [
           "á",
           "à",
           "é",
@@ -622,70 +600,55 @@ const LANGUAGE_PROFILES = {
           "ò",
           "ú",
           "ù",
-
           "ḵ",
           "ḵʼ",
-
           "x̱",
           "x̱ʼ",
-
           "ʼ",
-
-          "aa",
           "áa",
           "àa",
-
-          "ee",
           "ée",
           "èe",
-
-          "ii",
           "íi",
           "ìi",
-
-          "oo",
           "óo",
           "òo",
-
-          "uu",
           "úu",
           "ùu"
         ],
 
         mappings: {
-
-          "kh": "ḵ",
+          kh: "ḵ",
           "kh'": "ḵʼ",
-
-          "xh": "x̱",
+          xh: "x̱",
           "xh'": "x̱ʼ",
-
           "a'": "á",
           "a`": "à",
-
           "e'": "é",
           "e`": "è",
-
           "i'": "í",
           "i`": "ì",
-
           "o'": "ó",
           "o`": "ò",
-
           "u'": "ú",
           "u`": "ù",
-
           "'": "ʼ"
         }
       },
 
-
-      "ANLC": {
+      ANLC: {
         note:
           "Alaska Native Language Center Haida spelling system. This is maintained separately because it differs from the Enrico system.",
 
-        chars: [
+        regularLatin: [
+          "aa",
+          "ee",
+          "ii",
+          "oo",
+          "uu"
+        ],
 
+        special: [
           "á",
           "à",
           "é",
@@ -696,347 +659,270 @@ const LANGUAGE_PROFILES = {
           "ò",
           "ú",
           "ù",
-
           "ḵ",
           "ḵʼ",
-
           "x̱",
           "x̱ʼ",
-
           "ʼ",
-
-          "aa",
           "áa",
           "àa",
-
-          "ee",
           "ée",
           "èe",
-
-          "ii",
           "íi",
           "ìi",
-
-          "oo",
           "óo",
           "òo",
-
-          "uu",
           "úu",
           "ùu"
         ],
 
         mappings: {
-
-          "kh": "ḵ",
+          kh: "ḵ",
           "kh'": "ḵʼ",
-
-          "xh": "x̱",
+          xh: "x̱",
           "xh'": "x̱ʼ",
-
           "a'": "á",
           "a`": "à",
-
           "e'": "é",
           "e`": "è",
-
           "i'": "í",
           "i`": "ì",
-
           "o'": "ó",
           "o`": "ò",
-
           "u'": "ú",
           "u`": "ù",
-
           "'": "ʼ"
         }
       }
     }
   },
-
 
   "Kwak̓wala": {
     code: "kwk",
 
-    orthographies: {
+    /*
+     * Placeholder lexical data for development.
+     *
+     * Replace this with the actual Kwak̓wala dictionary data.
+     */
+    dictionary: [
+      "La̱maa̱n",
+      "g̱wagwixsʼalał",
+      "ḵ̓iḵ̓eḵa̱lasa",
+      "t̓a̱p̓idux̱"
+    ],
 
+    orthographies: {
       "U'mista": {
         note:
           "Modern U'mista orthography. This is the practical orthography developed by the U'mista Cultural Society.",
 
-        chars: [
-
-          "a̱",
-
+        regularLatin: [
+          "a",
           "b",
           "c",
-          "č",
-
           "d",
           "dz",
-
           "g",
+          "k",
+          "l",
+          "m",
+          "n",
+          "p",
+          "q",
+          "qw",
+          "s",
+          "t",
+          "ts",
+          "w",
+          "x",
+          "xw",
+          "y",
+          "z"
+        ],
+
+        special: [
+          "a̱",
+          "č",
           "g̱",
           "g̱w",
-
-          "k",
           "k̓",
           "k̓w",
-
           "ḵ",
           "ḵ̓",
           "ḵw",
           "ḵ̓w",
-
           "ł",
-
-          "m",
-          "n",
-
-          "p",
-          "p̓",
-
-          "q",
           "q̓",
-          "qw",
           "q̓w",
-
-          "s",
           "š",
-
-          "t",
           "t̓",
-
           "tł",
           "t̓ł",
-
-          "ts",
           "t̓s",
-
-          "w",
-          "x",
           "x̱",
-          "xw",
           "x̱w",
-
-          "y",
-
-          "z",
-
           "ə",
-
           "ʼ"
         ],
 
         mappings: {
-
           "a_": "a̱",
-
-          "ch": "č",
-          "sh": "š",
-
-          "gh": "g̱",
-          "ghw": "g̱w",
-
+          ch: "č",
+          sh: "š",
+          gh: "g̱",
+          ghw: "g̱w",
           "k'": "k̓",
           "k'w": "k̓w",
-
-          "kh": "ḵ",
+          kh: "ḵ",
           "kh'": "ḵ̓",
-          "khw": "ḵw",
+          khw: "ḵw",
           "kh'w": "ḵ̓w",
-
-          "lh": "ł",
-
+          lh: "ł",
           "p'": "p̓",
-
           "q'": "q̓",
-          "qw": "qw",
+          qw: "qw",
           "qw'": "q̓w",
-
           "t'": "t̓",
-
-          "tl": "tł",
+          tl: "tł",
           "tl'": "t̓ł",
-
           "ts'": "t̓s",
-
-          "xw": "xw",
-          "xhw": "x̱w",
-          "xh": "x̱",
-
+          xw: "xw",
+          xhw: "x̱w",
+          xh: "x̱",
           "'": "ʼ"
         }
       }
     }
   },
 
-
   "Nuu-chah-nulth": {
     code: "nch",
 
-    orthographies: {
+    /*
+     * Placeholder lexical data for development.
+     *
+     * Replace this with the actual Nuu-chah-nulth dictionary data.
+     */
+    dictionary: [
+      "ʔUyaaƛaḥ",
+      "hawiiʔaƛii",
+      "maapt̓ał",
+      "c̓išaaʔatḥ"
+    ],
 
-      "Standard": {
+    orthographies: {
+      Standard: {
         note:
           "Standard Nuu-chah-nulth orthography.",
 
-        chars: [
-
-          "ʔ",
-
+        regularLatin: [
           "a",
           "e",
           "i",
           "o",
           "u",
+          "s"
+        ],
 
+        special: [
+          "ʔ",
           "á",
           "é",
           "í",
           "ó",
           "ú",
-
           "c̓",
-
           "č",
-
           "ḥ",
-
           "ł",
-
           "m̓",
           "n̓",
-
           "p̓",
           "q̓",
-
-          "s",
-
           "š",
-
           "t̓",
-
           "w̓",
-
           "x̌",
-
           "ƛ",
           "ƛ̓",
-
           "ʷ",
-
           "ʼ"
         ],
 
         mappings: {
-
-          "ch": "č",
-
+          ch: "č",
           "ch'": "c̓",
-
           "h.": "ḥ",
-
-          "sh": "š",
-
+          sh: "š",
           "x.": "x̌",
-
-          "tl": "ƛ",
+          tl: "ƛ",
           "tl'": "ƛ̓",
-
           "m'": "m̓",
           "n'": "n̓",
-
           "p'": "p̓",
           "q'": "q̓",
-
           "t'": "t̓",
           "w'": "w̓",
-
           "'": "ʔ"
         }
       },
 
-
-      "Bouchard": {
+      Bouchard: {
         note:
           "Bouchard orthography. This system uses 7 for glottal stop and differs substantially from the Standard orthography.",
 
-        chars: [
-
-          "7",
-
+        regularLatin: [
           "a",
           "e",
           "i",
           "o",
           "u",
+          "c",
+          "lh",
+          "s",
+          "x",
+          "xw"
+        ],
 
+        special: [
+          "7",
           "á",
           "é",
           "í",
           "ó",
           "ú",
-
-          "c",
           "cʼ",
-
           "č",
           "čʼ",
-
           "ẖ",
-
-          "lh",
-
           "ł",
-
           "m̓",
           "n̓",
-
           "pʼ",
-
           "q",
           "qʼ",
-
-          "s",
           "š",
-
           "tʼ",
-
           "w̓",
-
-          "x",
-
-          "xw",
-
           "ƛ",
           "ƛʼ",
-
           "ʷ"
         ],
 
         mappings: {
-
-          "ch": "č",
+          ch: "č",
           "ch'": "čʼ",
-
           "h.": "ẖ",
-
-          "sh": "š",
-
-          "tl": "ƛ",
+          sh: "š",
+          tl: "ƛ",
           "tl'": "ƛʼ",
-
           "m'": "m̓",
           "n'": "n̓",
-
           "p'": "pʼ",
           "q'": "qʼ",
-
           "t'": "tʼ",
           "w'": "w̓",
-
           "'": "7"
         }
       }
@@ -1044,16 +930,13 @@ const LANGUAGE_PROFILES = {
   }
 };
 
-
 /*
- * Provides local example words for the suggestion UI.
+ * Provides lightweight local example words for the suggestion UI.
  *
- * These are interface examples rather than a dictionary and should not
- * be presented as an authoritative lexical database.
+ * These are interface examples rather than authoritative dictionaries.
  */
 const SUGGESTIONS = {
-
-  "Lushootseed": [
+  Lushootseed: [
     "šəq̓ʷ",
     "ʔəs",
     "x̌ʷəl",
@@ -1067,14 +950,14 @@ const SUGGESTIONS = {
     "skookum"
   ],
 
-  "Tlingit": [
+  Tlingit: [
     "gunalchéesh",
     "yakʼéixʼ",
     "áwé",
     "haa"
   ],
 
-  "Haida": [
+  Haida: [
     "Yáahl",
     "háaw",
     "ḵwáan",
@@ -1096,28 +979,70 @@ const SUGGESTIONS = {
   ]
 };
 
+/*
+ * Deduplicates palette entries using Unicode NFC normalization.
+ */
+function uniquePaletteEntries(entries) {
+  return [
+    ...new Set(
+      entries.map((entry) =>
+        entry.normalize("NFC")
+      )
+    )
+  ];
+}
+
+/*
+ * Returns the special-character palette for an orthography.
+ */
+function getOrthographySpecialCharacters(orthography) {
+  return uniquePaletteEntries(
+    orthography.special
+  );
+}
+
+/*
+ * Returns the full palette (regular Latin sequences plus special) for an
+ * orthography.
+ */
+function getOrthographyAllCharacters(orthography) {
+  return uniquePaletteEntries([
+    ...orthography.regularLatin,
+    ...orthography.special
+  ]);
+}
 
 /*
  * Inserts a string at the current caret position.
  */
-function insertAtCaret(textarea, value, setText) {
-
+function insertAtCaret(
+  textarea,
+  value,
+  setText
+) {
   if (!textarea) {
     return;
   }
 
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
+  const start =
+    textarea.selectionStart;
+
+  const end =
+    textarea.selectionEnd;
 
   const next =
-    textarea.value.slice(0, start) +
+    textarea.value.slice(
+      0,
+      start
+    ) +
     value +
-    textarea.value.slice(end);
+    textarea.value.slice(
+      end
+    );
 
   setText(next);
 
   requestAnimationFrame(() => {
-
     textarea.focus();
 
     const position =
@@ -1131,24 +1056,32 @@ function insertAtCaret(textarea, value, setText) {
   });
 }
 
-
 /*
- * Applies the longest matching transliteration sequence immediately
+ * Applies the longest matching ASCII transliteration sequence immediately
  * before the current caret position.
  */
-function applyMapping(textarea, mapping, setText) {
-
+function applyMapping(
+  textarea,
+  mapping,
+  setText
+) {
   if (!textarea) {
     return;
   }
 
-  const start = textarea.selectionStart;
+  const start =
+    textarea.selectionStart;
 
   const before =
-    textarea.value.slice(0, start);
+    textarea.value.slice(
+      0,
+      start
+    );
 
   const after =
-    textarea.value.slice(start);
+    textarea.value.slice(
+      start
+    );
 
   const keys =
     Object.keys(mapping)
@@ -1182,7 +1115,6 @@ function applyMapping(textarea, mapping, setText) {
   setText(next);
 
   requestAnimationFrame(() => {
-
     textarea.focus();
 
     const position =
@@ -1197,51 +1129,21 @@ function applyMapping(textarea, mapping, setText) {
   });
 }
 
-
 /*
  * Copies the current text to the system clipboard.
  */
 async function copyText(text) {
-
   try {
-
     await navigator.clipboard.writeText(
       text
     );
-
   } catch {
-
     window.prompt(
       "Copy this text:",
       text
     );
   }
 }
-
-
-/*
- * Returns a flattened list of characters from every orthography
- * belonging to the selected language.
- *
- * This is useful for the "all characters" palette.
- */
-function getAllLanguageCharacters(languageProfile) {
-
-  const characters =
-    languageProfile.orthographies;
-
-  const all =
-    Object.values(characters)
-      .flatMap(
-        (orthography) =>
-          orthography.chars
-      );
-
-  return [
-    ...new Set(all)
-  ];
-}
-
 
 /*
  * Returns the currently selected orthography.
@@ -1250,21 +1152,181 @@ function getOrthography(
   languageProfile,
   orthographyName
 ) {
-
   return (
-    languageProfile
-      .orthographies[
-        orthographyName
-      ]
+    languageProfile.orthographies[
+      orthographyName
+    ]
   );
 }
 
+/*
+ * Normalizes a dictionary word for reliable Unicode comparison.
+ */
+function normalizeDictionaryWord(word) {
+  return word
+    .normalize("NFC")
+    .trim()
+    .toLocaleLowerCase();
+}
 
 /*
- * Renders the complete CedarType interface.
+ * Converts a dictionary array into a Set for constant-time word lookup.
+ */
+function buildDictionarySet(dictionary) {
+  return new Set(
+    dictionary.map(
+      normalizeDictionaryWord
+    )
+  );
+}
+
+/*
+ * Removes punctuation surrounding a word while preserving Unicode letters,
+ * combining marks, glottal symbols, and other relevant linguistic characters.
+ */
+function cleanWordForDictionary(word) {
+  return word
+    .normalize("NFC")
+    .replace(
+      /^[^\p{L}\p{M}\p{N}ʼʔƛł]+/u,
+      ""
+    )
+    .replace(
+      /[^\p{L}\p{M}\p{N}ʼʔƛł]+$/u,
+      ""
+    )
+    .toLocaleLowerCase();
+}
+
+/*
+ * Splits editor text into word-like tokens while preserving their positions.
+ */
+function tokenizeText(text) {
+  const tokens = [];
+  const regex = /\S+/gu;
+  let match;
+
+  while (
+    (match = regex.exec(text)) !== null
+  ) {
+    tokens.push({
+      word: match[0],
+      start: match.index,
+      end:
+        match.index +
+        match[0].length
+    });
+  }
+
+  return tokens;
+}
+
+/*
+ * Returns the words that are absent from the selected language dictionary.
+ */
+function getMisspelledWords(
+  text,
+  dictionarySet
+) {
+  const tokens =
+    tokenizeText(text);
+
+  return tokens.filter(
+    (token) => {
+      const cleaned =
+        cleanWordForDictionary(
+          token.word
+        );
+
+      if (!cleaned) {
+        return false;
+      }
+
+      return !dictionarySet.has(
+        cleaned
+      );
+    }
+  );
+}
+
+/*
+ * Creates a spellcheck-aware representation of the editor text.
+ *
+ * The textarea itself remains transparent so the user can type normally,
+ * while this layer provides the visual dictionary highlighting underneath.
+ */
+function renderSpellcheckLayer(
+  text,
+  dictionarySet
+) {
+  const tokens =
+    tokenizeText(text);
+
+  if (!tokens.length) {
+    return null;
+  }
+
+  const elements = [];
+  let previousEnd = 0;
+
+  tokens.forEach(
+    (token, index) => {
+      const whitespace =
+        text.slice(
+          previousEnd,
+          token.start
+        );
+
+      if (whitespace) {
+        elements.push(
+          <Fragment
+            key={`space-${index}`}
+          >
+            {whitespace}
+          </Fragment>
+        );
+      }
+
+      const cleaned =
+        cleanWordForDictionary(
+          token.word
+        );
+
+      const misspelled =
+        cleaned &&
+        !dictionarySet.has(
+          cleaned
+        );
+
+      elements.push(
+        <span
+          key={`word-${index}`}
+          className={
+            misspelled
+              ? "misspelled"
+              : ""
+          }
+        >
+          {token.word}
+        </span>
+      );
+
+      previousEnd =
+        token.end;
+    }
+  );
+
+  elements.push(
+    text.slice(previousEnd)
+  );
+
+  return elements;
+}
+
+/*
+ * Renders the complete CedarType application.
  */
 function App() {
-
   const [
     language,
     setLanguage
@@ -1302,15 +1364,16 @@ function App() {
   const textareaRef =
     useRef(null);
 
+  const spellcheckRef =
+    useRef(null);
 
   const profile =
     LANGUAGE_PROFILES[
       language
     ];
 
-
   /*
-   * Retrieves the selected orthography profile.
+   * Retrieves the currently selected orthography.
    */
   const currentOrthography =
     getOrthography(
@@ -1318,38 +1381,63 @@ function App() {
       orthography
     );
 
-
   /*
-   * Generates the character palette for the current language.
+   * Builds the dictionary lookup Set for the current language.
    */
-  const characters =
-    useMemo(() => {
+  const dictionarySet =
+    useMemo(
+      () =>
+        buildDictionarySet(
+          profile.dictionary ||
+            []
+        ),
+      [profile.dictionary]
+    );
 
-      if (
-        showAllCharacters
-      ) {
-
-        return getAllLanguageCharacters(
-          profile
-        );
-      }
-
-      return currentOrthography.chars;
-
-    }, [
-      profile,
-      currentOrthography,
-      showAllCharacters
-    ]);
+  /*
+   * Finds the words in the current composition that are not present in the
+   * selected language dictionary.
+   */
+  const misspelledWords =
+    useMemo(
+      () =>
+        getMisspelledWords(
+          text,
+          dictionarySet
+        ),
+      [
+        text,
+        dictionarySet
+      ]
+    );
 
 
   /*
-   * Generates lightweight local suggestions based on the current
-   * word prefix.
+   * Generates the character palette for the selected orthography.
+   *
+   * Normal mode shows special characters only. All-characters mode adds the
+   * orthography's regular Latin input sequences (including digraphs).
+   */
+  const characters = useMemo(() => {
+    if (showAllCharacters) {
+      return getOrthographyAllCharacters(
+        currentOrthography
+      );
+    }
+
+    return getOrthographySpecialCharacters(
+      currentOrthography
+    );
+  }, [
+    currentOrthography,
+    showAllCharacters
+  ]);
+
+  /*
+   * Generates lightweight local suggestions based on the current word prefix.
    */
   const currentSuggestions =
     useMemo(() => {
-
       const words =
         SUGGESTIONS[
           language
@@ -1364,7 +1452,6 @@ function App() {
         "";
 
       if (!token) {
-
         return words.slice(
           0,
           4
@@ -1384,63 +1471,45 @@ function App() {
           0,
           4
         );
-
     }, [
       language,
       text
     ]);
 
-
   /*
    * Saves the selected language locally.
    */
   useEffect(() => {
-
     localStorage.setItem(
       "cedartype-language",
       language
     );
-
-  }, [
-    language
-  ]);
-
+  }, [language]);
 
   /*
    * Saves the selected orthography locally.
    */
   useEffect(() => {
-
     localStorage.setItem(
       "cedartype-orthography",
       orthography
     );
-
-  }, [
-    orthography
-  ]);
-
+  }, [orthography]);
 
   /*
-   * Saves the composition locally.
+   * Saves the current composition locally.
    */
   useEffect(() => {
-
     localStorage.setItem(
       "cedartype-text",
       text
     );
-
-  }, [
-    text
-  ]);
-
+  }, [text]);
 
   /*
    * Restores CedarType state from local storage.
    */
   useEffect(() => {
-
     const savedLanguage =
       localStorage.getItem(
         "cedartype-language"
@@ -1456,14 +1525,12 @@ function App() {
         "cedartype-text"
       );
 
-
     if (
       savedLanguage &&
       LANGUAGE_PROFILES[
         savedLanguage
       ]
     ) {
-
       setLanguage(
         savedLanguage
       );
@@ -1484,39 +1551,45 @@ function App() {
           savedOrthography
         )
       ) {
-
         setOrthography(
           savedOrthography
         );
-
       } else {
-
         setOrthography(
           orthographies[0]
         );
       }
-
     }
 
-
     if (savedText) {
-
       setText(
         savedText
       );
     }
-
   }, []);
 
+  /*
+   * Synchronizes the spellcheck overlay's scroll position with the textarea.
+   */
+  function handleScroll(event) {
+    if (
+      spellcheckRef.current
+    ) {
+      spellcheckRef.current.scrollTop =
+        event.target.scrollTop;
+
+      spellcheckRef.current.scrollLeft =
+        event.target.scrollLeft;
+    }
+  }
 
   /*
-   * Changes language and automatically selects the first available
-   * orthography for that language.
+   * Changes language and automatically selects its first available
+   * orthography.
    */
   function handleLanguageChange(
     nextLanguage
   ) {
-
     setLanguage(
       nextLanguage
     );
@@ -1534,15 +1607,15 @@ function App() {
     setOrthography(
       nextOrthographies[0]
     );
-  }
 
+    setText("");
+  }
 
   /*
    * Handles normal keyboard input and applies the active orthography's
    * ASCII-to-Unicode mappings.
    */
   function handleInput(event) {
-
     setText(
       event.target.value
     );
@@ -1552,22 +1625,18 @@ function App() {
     }
 
     requestAnimationFrame(() => {
-
       applyMapping(
         event.target,
         currentOrthography.mappings,
         setText
       );
-
     });
   }
 
-
   /*
-   * Inserts a local suggestion at the current word position.
+   * Inserts a suggestion at the current word position.
    */
   function useSuggestion(word) {
-
     const textarea =
       textareaRef.current;
 
@@ -1601,8 +1670,7 @@ function App() {
               existing.length
             )
           : word
-      ) +
-      " ";
+      ) + " ";
 
     insertAtCaret(
       textarea,
@@ -1611,12 +1679,10 @@ function App() {
     );
   }
 
-
   /*
    * Copies the current composition and displays short visual feedback.
    */
   async function handleCopy() {
-
     await copyText(
       text
     );
@@ -1630,36 +1696,55 @@ function App() {
     );
   }
 
-
   /*
    * Clears the current composition.
    */
   function clearText() {
-
     setText("");
 
     requestAnimationFrame(() => {
-
       textareaRef.current?.focus();
-
     });
   }
 
-
   return (
-
     <main className="app-shell">
-
       <header className="topbar">
-
         <div className="brand">
-
-          <div className="brand-mark">
-            C
+          <div
+            className="brand-mark"
+            aria-label="CedarType cedar tree logo"
+          >
+            <svg
+              viewBox="0 0 64 64"
+              role="img"
+              aria-hidden="true"
+            >
+              <path
+                d="
+                  M32 3
+                  L20 20
+                  L27 20
+                  L15 35
+                  L24 35
+                  L12 51
+                  L28 51
+                  L28 61
+                  L36 61
+                  L36 51
+                  L52 51
+                  L40 35
+                  L49 35
+                  L37 20
+                  L44 20
+                  Z
+                "
+                fill="currentColor"
+              />
+            </svg>
           </div>
 
           <div>
-
             <h1>
               CedarType
             </h1>
@@ -1668,16 +1753,11 @@ function App() {
               Pacific Northwest Indigenous
               Language IME
             </p>
-
           </div>
-
         </div>
 
-
         <div className="header-actions">
-
           <label className="select-wrap">
-
             <span>
               Language
             </span>
@@ -1690,29 +1770,22 @@ function App() {
                 )
               }
             >
-
               {Object.keys(
                 LANGUAGE_PROFILES
               ).map(
                 (name) => (
-
                   <option
                     key={name}
                     value={name}
                   >
                     {name}
                   </option>
-
                 )
               )}
-
             </select>
-
           </label>
 
-
           <label className="select-wrap">
-
             <span>
               Orthography
             </span>
@@ -1725,35 +1798,25 @@ function App() {
                 )
               }
             >
-
               {Object.keys(
                 profile.orthographies
               ).map(
                 (name) => (
-
                   <option
                     key={name}
                     value={name}
                   >
                     {name}
                   </option>
-
                 )
               )}
-
             </select>
-
           </label>
-
         </div>
-
       </header>
 
-
       <section className="hero">
-
         <div>
-
           <p className="eyebrow">
             COMMUNITY-CONFIGURABLE INPUT
           </p>
@@ -1767,34 +1830,25 @@ function App() {
             Unicode-first composition for
             Pacific Northwest Indigenous
             languages, with orthography-aware
-            character palettes and optional
+            character palettes, dictionary
+            spellchecking, and optional
             transliteration shortcuts.
           </p>
-
         </div>
 
-
         <div className="hero-badge">
-
           <span>
             ●
           </span>
 
           Offline-ready
-
         </div>
-
       </section>
 
-
       <section className="workspace">
-
         <div className="editor-card">
-
           <div className="editor-toolbar">
-
             <div className="toolbar-label">
-
               <span className="dot" />
 
               {language}
@@ -1804,12 +1858,9 @@ function App() {
               </span>
 
               {orthography}
-
             </div>
 
-
             <div className="toolbar-actions">
-
               <button
                 className="ghost-button"
                 onClick={
@@ -1831,32 +1882,47 @@ function App() {
                     : "Copy"
                 }
               </button>
-
             </div>
-
           </div>
 
+          <div className="editor-input-wrapper">
+            <div
+              ref={
+                spellcheckRef
+              }
+              className="spellcheck-layer"
+              aria-hidden="true"
+            >
+              {renderSpellcheckLayer(
+                text,
+                dictionarySet
+              )}
+            </div>
 
-          <textarea
-            ref={textareaRef}
-            value={text}
-            onChange={
-              handleInput
-            }
-            placeholder={
-              `Start typing in ${language}…`
-            }
-            spellCheck="false"
-            autoCapitalize="off"
-            autoCorrect="off"
-            aria-label={
-              `${language} ${orthography} composition area`
-            }
-          />
-
+            <textarea
+              ref={
+                textareaRef
+              }
+              value={text}
+              onChange={
+                handleInput
+              }
+              onScroll={
+                handleScroll
+              }
+              placeholder={
+                `Start typing in ${language}…`
+              }
+              spellCheck="false"
+              autoCapitalize="off"
+              autoCorrect="off"
+              aria-label={
+                `${language} ${orthography} composition area`
+              }
+            />
+          </div>
 
           <div className="editor-footer">
-
             <span>
               {text.length} characters
             </span>
@@ -1865,17 +1931,27 @@ function App() {
               {currentOrthography.note}
             </span>
 
+            <span
+              className={
+                misspelledWords.length
+                  ? "spellcheck-warning"
+                  : "spellcheck-ok"
+              }
+            >
+              {misspelledWords.length
+                ? `${misspelledWords.length} word${
+                    misspelledWords.length === 1
+                      ? ""
+                      : "s"
+                  } not found`
+                : "✓ Dictionary check passed"}
+            </span>
           </div>
-
         </div>
 
-
         <aside className="side-card">
-
           <div className="side-heading">
-
             <div>
-
               <p className="eyebrow">
                 SUGGESTIONS
               </p>
@@ -1883,19 +1959,13 @@ function App() {
               <h3>
                 Compose faster
               </h3>
-
             </div>
-
           </div>
 
-
           <div className="suggestions">
-
             {currentSuggestions.length ? (
-
               currentSuggestions.map(
                 (word) => (
-
                   <button
                     key={word}
                     className="suggestion"
@@ -1905,7 +1975,6 @@ function App() {
                       )
                     }
                   >
-
                     <span>
                       {word}
                     </span>
@@ -1913,35 +1982,24 @@ function App() {
                     <span className="arrow">
                       ↵
                     </span>
-
                   </button>
-
                 )
               )
-
             ) : (
-
               <p className="muted">
                 No local suggestions
                 for this prefix.
               </p>
-
             )}
-
           </div>
 
-
           <div className="settings">
-
             <p className="eyebrow">
               INPUT
             </p>
 
-
             <label className="toggle-row">
-
               <span>
-
                 <strong>
                   Auto-replace
                 </strong>
@@ -1950,70 +2008,52 @@ function App() {
                   ASCII shortcuts →
                   Unicode orthography
                 </small>
-
               </span>
-
 
               <input
                 type="checkbox"
                 checked={
                   autoReplace
                 }
-                onChange={
-                  (event) =>
-                    setAutoReplace(
-                      event.target.checked
-                    )
+                onChange={(event) =>
+                  setAutoReplace(
+                    event.target.checked
+                  )
                 }
               />
-
             </label>
 
-
             <label className="toggle-row">
-
               <span>
-
                 <strong>
                   All characters
                 </strong>
 
                 <small>
-                  Show every character
-                  available for this language
+                  Show regular Latin
+                  sequences for this orthography
                 </small>
-
               </span>
-
 
               <input
                 type="checkbox"
                 checked={
                   showAllCharacters
                 }
-                onChange={
-                  (event) =>
-                    setShowAllCharacters(
-                      event.target.checked
-                    )
+                onChange={(event) =>
+                  setShowAllCharacters(
+                    event.target.checked
+                  )
                 }
               />
-
             </label>
-
           </div>
-
         </aside>
-
       </section>
 
-
       <section className="keyboard-card">
-
         <div className="keyboard-header">
-
           <div>
-
             <p className="eyebrow">
               CHARACTER PALETTE
             </p>
@@ -2023,25 +2063,18 @@ function App() {
                 ? "All available characters"
                 : "Orthography characters"}
             </h3>
-
           </div>
 
           <span className="keyboard-hint">
             Click a character to insert it
           </span>
-
         </div>
 
-
         <div className="keys">
-
           {characters.map(
-            (character, index) => (
-
+            (character) => (
               <button
-                key={
-                  `${character}-${index}`
-                }
+                key={character}
                 className="key"
                 onClick={() =>
                   insertAtCaret(
@@ -2056,17 +2089,12 @@ function App() {
               >
                 {character}
               </button>
-
             )
           )}
-
         </div>
-
       </section>
 
-
       <footer className="footer">
-
         <span>
           CedarType
         </span>
@@ -2074,25 +2102,24 @@ function App() {
         <span>
           Unicode-first •
           Orthography-aware •
+          Dictionary-aware •
           Local composition
         </span>
-
       </footer>
-
     </main>
   );
 }
 
-
+/*
+ * Mounts the CedarType React application into the root DOM element.
+ */
 createRoot(
   document.getElementById(
     "root"
   )
 ).render(
-
   <React.StrictMode>
-
     <App />
-
   </React.StrictMode>
 );
+
