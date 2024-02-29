@@ -1829,9 +1829,8 @@ function App() {
           <p className="hero-copy">
             Unicode-first composition for
             Pacific Northwest Indigenous
-            languages, with orthography-aware
-            character palettes, dictionary
-            spellchecking, and optional
+            languages, with character palettes, dictionary
+            spellchecking, and
             transliteration shortcuts.
           </p>
         </div>
