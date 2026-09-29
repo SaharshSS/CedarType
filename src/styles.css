@@ -459,53 +459,22 @@ textarea::placeholder {
   }
 }
 
-/* Creates the positioning context for the textarea and spellcheck overlay. */
+/* Editor input surface. */
 .editor-input-wrapper {
-  position: relative;
   width: 100%;
   min-height: 300px;
 }
 
-/* Places the dictionary highlighting beneath the actual textarea. */
-.spellcheck-layer {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
-  word-break: normal;
-  pointer-events: none;
-
-  padding: 24px;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 25px;
-  line-height: 1.65;
-
-  color: #17332c;
-}
-
-/* Keeps the actual textarea above the spellcheck overlay. */
+/* The textarea owns visible text and input; spellcheck runs separately. */
 .editor-input-wrapper textarea {
-  position: relative;
-  z-index: 1;
-
   width: 100%;
   min-height: 300px;
 
   background: transparent;
-  /* Text is drawn by .spellcheck-layer; textarea only captures input. */
-  color: transparent;
+  /* Keep the user's text visible even if spellcheck highlighting is unavailable. */
+  color: #17332c;
   caret-color: #17332c;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Draws the red wavy underline beneath words absent from the dictionary. */
-.misspelled {
-  text-decoration-line: underline;
-  text-decoration-style: wavy;
-  text-decoration-color: #dc2626;
-  text-decoration-thickness: 1.5px;
+  -webkit-text-fill-color: #17332c;
 }
 
 /* Indicates that every word was found in the current dictionary. */
@@ -536,8 +505,296 @@ textarea::placeholder {
   height: 38px;
 }
 
-/* Prevents the spellcheck overlay from visually interfering with the editor. */
-.spellcheck-layer span {
-  pointer-events: none;
+/* CedarType landing page */
+body:has(.landing-page) {
+  background: #102a24;
 }
 
+.landing-page {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #102a24;
+  color: #f5f0df;
+  isolation: isolate;
+}
+
+.landing-page::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: radial-gradient(ellipse at 78% 37%, rgba(55, 104, 76, .28), transparent 40%),
+    radial-gradient(ellipse at 15% 95%, rgba(158, 133, 74, .10), transparent 35%);
+  content: "";
+}
+
+.landing-nav,
+.landing-hero,
+.language-strip,
+.download-section,
+.roadmap-section,
+.thanks-section,
+.landing-footer {
+  width: min(1160px, calc(100% - 64px));
+  margin: 0 auto;
+}
+
+.landing-nav {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 88px;
+  border-bottom: 1px solid rgba(239, 235, 215, .15);
+}
+
+.landing-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  color: #f5f0df;
+  font-family: Georgia, serif;
+  font-size: 20px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.landing-mark {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgba(212, 188, 124, .55);
+  border-radius: 50% 50% 50% 8px;
+  color: #d8c17e;
+  font-size: 23px;
+}
+
+.landing-mark svg { width: 29px; height: 29px; }
+
+.nav-github,
+.landing-footer > a:last-child {
+  color: #c4cdbf;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.nav-github span { color: #d8c17e; margin-left: 8px; }
+.nav-github { display: grid; width: 39px; height: 39px; place-items: center; border: 1px solid rgba(239, 235, 215, .22); border-radius: 50%; }
+.nav-github svg { width: 19px; height: 19px; }
+
+.landing-hero {
+  position: relative;
+  display: grid;
+  min-height: 590px;
+  grid-template-columns: 1fr 0.9fr;
+  align-items: center;
+  padding: 54px 0 70px;
+}
+
+.landing-copy { position: relative; z-index: 1; max-width: 600px; }
+.landing-eyebrow {
+  color: #cfbd82;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .19em;
+}
+
+.landing-eyebrow span {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 9px;
+  border-radius: 50%;
+  background: #83a579;
+  box-shadow: 0 0 13px #83a579;
+}
+
+.landing-copy h1 {
+  margin-top: 27px;
+  color: #f4f0e2;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(58px, 7.2vw, 94px);
+  font-weight: 400;
+  line-height: .99;
+  letter-spacing: -.06em;
+}
+
+.landing-copy h1 em,
+.download-intro h2 em { color: #d8c17e; font-weight: 400; }
+.landing-description {
+  max-width: 455px;
+  margin-top: 25px;
+  color: #bdc9bd;
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.landing-actions { display: flex; align-items: center; gap: 27px; margin-top: 31px; }
+.launch-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 20px;
+  border: 0;
+  border-radius: 5px;
+  background: #d8c17e;
+  padding: 15px 19px;
+  color: #17362c;
+  font-size: 13px;
+  font-weight: 750;
+  transition: transform .2s ease, background .2s ease;
+}
+.launch-button:hover { transform: translateY(-2px); background: #ead99e; }
+.text-link { color: #e4e8d9; font-size: 13px; text-decoration: none; }
+.text-link { border: 0; background: none; padding: 0; cursor: pointer; }
+.text-link span { padding-left: 8px; color: #d8c17e; }
+.landing-note { margin-top: 21px; color: #87998b; font-size: 11px; letter-spacing: .04em; }
+
+.glyph-art {
+  position: relative;
+  display: grid;
+  width: min(100%, 490px);
+  aspect-ratio: 1;
+  place-self: center end;
+  place-items: center;
+}
+.glyph-orbit { position: absolute; border: 1px solid rgba(217, 207, 169, .17); border-radius: 50%; }
+.orbit-one { width: 86%; height: 86%; }
+.orbit-two { width: 66%; height: 66%; border-style: dashed; animation: orbit 55s linear infinite; }
+.orbit-three { width: 44%; height: 44%; border-color: rgba(217, 207, 169, .28); }
+.glyph-art::before {
+  position: absolute;
+  width: 26%;
+  height: 26%;
+  border-radius: 50%;
+  background: #d8c17e;
+  box-shadow: 0 0 80px 25px rgba(216, 193, 126, .16);
+  content: "";
+}
+.hero-glyph { position: absolute; color: #e7d9aa; font-family: Georgia, serif; text-shadow: 0 0 35px rgba(216, 193, 126, .18); }
+.glyph-a { top: 15%; left: 47%; font-size: 69px; animation: drift 6s ease-in-out infinite; }
+.glyph-b { top: 34%; right: 4%; color: #9fb99e; font-size: 57px; animation: drift 7s ease-in-out -2s infinite; }
+.glyph-c { right: 16%; bottom: 18%; color: #cfbd82; font-size: 68px; animation: drift 8s ease-in-out -1s infinite; }
+.glyph-d { bottom: 9%; left: 30%; color: #9fb99e; font-size: 58px; animation: drift 6.5s ease-in-out -3s infinite; }
+.glyph-e { top: 38%; left: 5%; color: #d9a77c; font-size: 51px; animation: drift 7.5s ease-in-out -4s infinite; }
+.glyph-caption { position: absolute; top: 46%; left: 50%; color: #29483b; font-family: Georgia, serif; font-size: 12px; line-height: 1.5; text-align: center; transform: translate(-50%, -50%); }
+
+.pnw-map-card {
+  position: relative;
+  width: min(100%, 480px);
+  align-self: center;
+  justify-self: end;
+  border: 1px solid rgba(224, 219, 190, .28);
+  border-radius: 8px;
+  background: rgba(231, 224, 190, .055);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, .2);
+  padding: 13px 15px 11px;
+  transform: rotate(1deg);
+}
+.map-topline, .map-bottomline { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #aab69e; font-size: 8px; letter-spacing: .12em; }
+.map-topline { border-bottom: 1px solid rgba(229, 225, 199, .13); padding-bottom: 10px; }
+.map-bottomline { border-top: 1px solid rgba(229, 225, 199, .13); padding-top: 10px; font-size: 7px; }
+.map-bottomline span:last-child { color: #d8c17e; font-size: 13px; }
+.pnw-map { display: block; width: 100%; margin: 2px 0; }
+.map-water { fill: #17362e; }
+.map-land { fill: #c3c39d; }
+.map-terrain { fill: url(#map-dots); }
+.map-border { fill: none; stroke: #667c66; stroke-width: 1; stroke-dasharray: 3 4; opacity: .82; }
+.map-river { fill: none; stroke: #709085; stroke-width: 2.2; opacity: .85; }
+.map-coast { fill: none; stroke: #e1d39b; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.map-mountain { fill: none; stroke: #9f795d; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: .9; }
+.map-label { fill: #3d5848; font-family: Inter, sans-serif; font-size: 10px; font-weight: 750; letter-spacing: 2px; text-anchor: middle; }
+.map-water-label { fill: #8da99a; font-family: Georgia, serif; font-size: 10px; font-style: italic; letter-spacing: 2px; }
+.map-pin-halo { fill: none; stroke: #b2694e; stroke-width: 1.2; opacity: .75; }
+.map-pin { fill: #b2694e; stroke: #f0dfb0; stroke-width: 2; }
+.map-city { fill: #6d4435; font-family: Georgia, serif; font-size: 13px; font-weight: 700; }
+
+.falling-field { position: absolute; z-index: -1; inset: 0; overflow: hidden; pointer-events: none; }
+.falling-glyph {
+  position: absolute;
+  top: -8vh;
+  left: var(--x);
+  color: #d9c98f;
+  font-family: Georgia, serif;
+  font-size: var(--size);
+  opacity: var(--opacity);
+  animation: fall var(--duration) linear var(--delay) infinite;
+}
+
+.language-strip {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  border-top: 1px solid rgba(239, 235, 215, .15);
+  border-bottom: 1px solid rgba(239, 235, 215, .15);
+  padding: 23px 0;
+}
+.language-strip > span { flex: 0 0 auto; color: #8a9c8d; font-size: 9px; font-weight: 750; letter-spacing: .16em; }
+.language-strip p { color: #d8dfd0; font-family: Georgia, serif; font-size: 14px; line-height: 1.8; }
+.language-strip i { padding: 0 7px; color: #c7af6f; font-style: normal; }
+
+.download-section { padding: 105px 0 96px; }
+.download-intro { display: flex; flex-direction: column; align-items: flex-start; }
+.download-intro h2 { margin-top: 17px; font-family: Georgia, serif; font-size: clamp(39px, 5vw, 57px); font-weight: 400; line-height: 1.05; letter-spacing: -.04em; }
+.download-intro > p:last-child { margin-top: 15px; color: #a9b8aa; font-size: 14px; line-height: 1.6; }
+.download-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 39px; }
+.download-card { min-height: 224px; border: 1px solid rgba(222, 223, 198, .16); border-radius: 7px; background: rgba(244, 242, 224, .035); padding: 22px; transition: background .2s ease, transform .2s ease; }
+.download-card:hover { transform: translateY(-3px); background: rgba(244, 242, 224, .07); }
+.platform-icon { display: grid; width: 37px; height: 37px; place-items: center; border: 1px solid rgba(216, 193, 126, .38); border-radius: 7px; color: #d8c17e; font-size: 21px; }
+.extension-icon { font-family: Georgia, serif; font-size: 27px; }
+.download-card h3 { margin-top: 20px; color: #f2efdf; font-family: Georgia, serif; font-size: 19px; font-weight: 400; }
+.download-card p { min-height: 39px; margin-top: 8px; color: #9eafa1; font-size: 12px; line-height: 1.6; }
+.download-card a { display: inline-flex; gap: 9px; margin-top: 16px; color: #d8c17e; font-size: 11px; font-weight: 700; text-decoration: none; }
+.download-card a svg { width: 13px; height: 13px; }
+.release-footnote { margin-top: 17px; color: #7f9586; font-size: 10px; }
+.roadmap-section { border-top: 1px solid rgba(239, 235, 215, .15); padding: 83px 0 88px; }
+.roadmap-heading h2, .thanks-heading h2 { margin-top: 15px; color: #f2efdf; font-family: Georgia, serif; font-size: clamp(36px, 4.4vw, 51px); font-weight: 400; letter-spacing: -.04em; }
+.roadmap-heading h2 em, .thanks-heading h2 em { color: #d8c17e; font-weight: 400; }
+.roadmap-heading > p:last-child, .thanks-heading > p { margin-top: 13px; color: #9eafa1; font-size: 13px; line-height: 1.7; }
+.roadmap-list { display: grid; grid-template-columns: 1fr 1fr; column-gap: 35px; margin-top: 32px; }
+.roadmap-item { display: grid; grid-template-columns: 24px 1fr auto; align-items: center; gap: 11px; min-height: 54px; border-bottom: 1px solid rgba(239, 235, 215, .11); color: #d5ddd0; font-size: 12px; }
+.roadmap-check { display: grid; width: 21px; height: 21px; place-items: center; border: 1px solid #879986; border-radius: 50%; color: #d8c17e; font-size: 11px; }
+.roadmap-item.is-done .roadmap-check { border-color: #86a57f; background: rgba(134, 165, 127, .13); color: #9fc092; }
+.roadmap-item small { color: #718a79; font-size: 7px; font-weight: 750; letter-spacing: .1em; }
+.thanks-section { border-top: 1px solid rgba(239, 235, 215, .15); padding: 67px 0 74px; }
+.thanks-heading { display: flex; align-items: end; justify-content: space-between; gap: 35px; }
+.thanks-heading > p { max-width: 360px; margin-bottom: 4px; }
+.thanks-empty { margin-top: 26px; border: 1px dashed rgba(239, 235, 215, .2); border-radius: 6px; padding: 22px; color: #9eafa1; font-size: 12px; }
+.thanks-empty code { color: #d8c17e; font-size: 11px; }
+.thanks-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; margin-top: 27px; }
+.thanks-image { display: grid; min-height: 126px; place-items: center; gap: 12px; border: 1px solid rgba(239, 235, 215, .16); border-radius: 6px; background: rgba(244, 242, 224, .035); padding: 17px; }
+.thanks-image img { display: block; max-width: 100%; max-height: 72px; object-fit: contain; }
+.thanks-image figcaption { color: #c7d0c2; font-size: 10px; text-align: center; text-transform: capitalize; }
+.landing-footer { display: flex; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid rgba(239, 235, 215, .15); padding: 24px 0 30px; }
+.landing-footer .landing-brand { font-size: 15px; }
+.landing-footer .landing-mark { width: 30px; height: 30px; font-size: 18px; }
+.landing-footer p { color: #85998b; font-size: 11px; }
+.landing-footer .contact-link { color: #d8c17e; font-size: 12px; text-decoration: none; }
+.contact-link span { padding-left: 5px; }
+
+.home-link { border: 1px solid #d5d9cf; border-radius: 9px; background: transparent; padding: 8px 11px; color: #53675c; font-size: 12px; font-weight: 700; }
+.home-link:hover { background: #f2f1e9; }
+
+@keyframes fall { from { transform: translate3d(0, -4vh, 0) rotate(0); } to { transform: translate3d(2vw, 112vh, 0) rotate(150deg); } }
+@keyframes drift { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-11px); } }
+@keyframes orbit { to { transform: rotate(360deg); } }
+
+@media (max-width: 760px) {
+  .landing-nav, .landing-hero, .language-strip, .download-section, .roadmap-section, .thanks-section, .landing-footer { width: min(100% - 40px, 600px); }
+  .landing-hero { min-height: auto; grid-template-columns: 1fr; padding: 74px 0 35px; }
+  .landing-copy h1 { font-size: clamp(58px, 13vw, 82px); }
+  .pnw-map-card { width: min(100%, 390px); margin-top: 15px; justify-self: center; }
+  .language-strip { align-items: flex-start; flex-direction: column; gap: 9px; }
+  .download-section { padding: 74px 0; }
+  .download-cards { grid-template-columns: 1fr; }
+  .download-card { min-height: auto; }
+  .download-card p { min-height: 0; }
+  .roadmap-list { grid-template-columns: 1fr; }
+  .thanks-heading { align-items: flex-start; flex-direction: column; gap: 0; }
+  .landing-footer { align-items: flex-start; flex-direction: column; gap: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+}

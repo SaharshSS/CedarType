@@ -1,5 +1,4 @@
 import React, {
-  Fragment,
   useEffect,
   useMemo,
   useRef,
@@ -9,6 +8,42 @@ import React, {
 import { createRoot } from "react-dom/client";
 
 import "./styles.css";
+
+import {
+  buildDictionarySet,
+  getMisspelledWords
+} from "./features/spellcheck.jsx";
+
+const thanksImages = Object.entries(
+  import.meta.glob("./assets/thanks/*.{png,jpg,jpeg,webp,gif,svg}", {
+    eager: true,
+    query: "?url",
+    import: "default"
+  })
+).map(([path, src]) => ({
+  src,
+  name: path.split("/").pop().replace(/\.[^.]+$/, "").replace(/[-_]/g, " ")
+}));
+
+function readLocalSetting(key) {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function writeLocalSetting(key, value) {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // The editor remains usable when browser storage is unavailable or full.
+  }
+}
+
+const FEATURES = {
+  spellcheck: true,
+};
 
 /*
  * Defines the language and orthography profiles used by CedarType.
@@ -1160,173 +1195,9 @@ function getOrthography(
 }
 
 /*
- * Normalizes a dictionary word for reliable Unicode comparison.
- */
-function normalizeDictionaryWord(word) {
-  return word
-    .normalize("NFC")
-    .trim()
-    .toLocaleLowerCase();
-}
-
-/*
- * Converts a dictionary array into a Set for constant-time word lookup.
- */
-function buildDictionarySet(dictionary) {
-  return new Set(
-    dictionary.map(
-      normalizeDictionaryWord
-    )
-  );
-}
-
-/*
- * Removes punctuation surrounding a word while preserving Unicode letters,
- * combining marks, glottal symbols, and other relevant linguistic characters.
- */
-function cleanWordForDictionary(word) {
-  return word
-    .normalize("NFC")
-    .replace(
-      /^[^\p{L}\p{M}\p{N}ʼʔƛł]+/u,
-      ""
-    )
-    .replace(
-      /[^\p{L}\p{M}\p{N}ʼʔƛł]+$/u,
-      ""
-    )
-    .toLocaleLowerCase();
-}
-
-/*
- * Splits editor text into word-like tokens while preserving their positions.
- */
-function tokenizeText(text) {
-  const tokens = [];
-  const regex = /\S+/gu;
-  let match;
-
-  while (
-    (match = regex.exec(text)) !== null
-  ) {
-    tokens.push({
-      word: match[0],
-      start: match.index,
-      end:
-        match.index +
-        match[0].length
-    });
-  }
-
-  return tokens;
-}
-
-/*
- * Returns the words that are absent from the selected language dictionary.
- */
-function getMisspelledWords(
-  text,
-  dictionarySet
-) {
-  const tokens =
-    tokenizeText(text);
-
-  return tokens.filter(
-    (token) => {
-      const cleaned =
-        cleanWordForDictionary(
-          token.word
-        );
-
-      if (!cleaned) {
-        return false;
-      }
-
-      return !dictionarySet.has(
-        cleaned
-      );
-    }
-  );
-}
-
-/*
- * Creates a spellcheck-aware representation of the editor text.
- *
- * The textarea itself remains transparent so the user can type normally,
- * while this layer provides the visual dictionary highlighting underneath.
- */
-function renderSpellcheckLayer(
-  text,
-  dictionarySet
-) {
-  const tokens =
-    tokenizeText(text);
-
-  if (!tokens.length) {
-    return null;
-  }
-
-  const elements = [];
-  let previousEnd = 0;
-
-  tokens.forEach(
-    (token, index) => {
-      const whitespace =
-        text.slice(
-          previousEnd,
-          token.start
-        );
-
-      if (whitespace) {
-        elements.push(
-          <Fragment
-            key={`space-${index}`}
-          >
-            {whitespace}
-          </Fragment>
-        );
-      }
-
-      const cleaned =
-        cleanWordForDictionary(
-          token.word
-        );
-
-      const misspelled =
-        cleaned &&
-        !dictionarySet.has(
-          cleaned
-        );
-
-      elements.push(
-        <span
-          key={`word-${index}`}
-          className={
-            misspelled
-              ? "misspelled"
-              : ""
-          }
-        >
-          {token.word}
-        </span>
-      );
-
-      previousEnd =
-        token.end;
-    }
-  );
-
-  elements.push(
-    text.slice(previousEnd)
-  );
-
-  return elements;
-}
-
-/*
  * Renders the complete CedarType application.
  */
-function App() {
+function EditorApp({ onHome }) {
   const [
     language,
     setLanguage
@@ -1364,9 +1235,6 @@ function App() {
   const textareaRef =
     useRef(null);
 
-  const spellcheckRef =
-    useRef(null);
-
   const profile =
     LANGUAGE_PROFILES[
       language
@@ -1386,11 +1254,17 @@ function App() {
    */
   const dictionarySet =
     useMemo(
-      () =>
-        buildDictionarySet(
-          profile.dictionary ||
-            []
-        ),
+      () => {
+        if (!FEATURES.spellcheck) {
+          return new Set();
+        }
+
+        try {
+          return buildDictionarySet(profile.dictionary || []);
+        } catch {
+          return new Set();
+        }
+      },
       [profile.dictionary]
     );
 
@@ -1400,11 +1274,17 @@ function App() {
    */
   const misspelledWords =
     useMemo(
-      () =>
-        getMisspelledWords(
-          text,
-          dictionarySet
-        ),
+      () => {
+        if (!FEATURES.spellcheck) {
+          return [];
+        }
+
+        try {
+          return getMisspelledWords(text, dictionarySet);
+        } catch {
+          return [];
+        }
+      },
       [
         text,
         dictionarySet
@@ -1480,50 +1360,32 @@ function App() {
    * Saves the selected language locally.
    */
   useEffect(() => {
-    localStorage.setItem(
-      "cedartype-language",
-      language
-    );
+    writeLocalSetting("cedartype-language", language);
   }, [language]);
 
   /*
    * Saves the selected orthography locally.
    */
   useEffect(() => {
-    localStorage.setItem(
-      "cedartype-orthography",
-      orthography
-    );
+    writeLocalSetting("cedartype-orthography", orthography);
   }, [orthography]);
 
   /*
    * Saves the current composition locally.
    */
   useEffect(() => {
-    localStorage.setItem(
-      "cedartype-text",
-      text
-    );
+    writeLocalSetting("cedartype-text", text);
   }, [text]);
 
   /*
    * Restores CedarType state from local storage.
    */
   useEffect(() => {
-    const savedLanguage =
-      localStorage.getItem(
-        "cedartype-language"
-      );
+    const savedLanguage = readLocalSetting("cedartype-language");
 
-    const savedOrthography =
-      localStorage.getItem(
-        "cedartype-orthography"
-      );
+    const savedOrthography = readLocalSetting("cedartype-orthography");
 
-    const savedText =
-      localStorage.getItem(
-        "cedartype-text"
-      );
+    const savedText = readLocalSetting("cedartype-text");
 
     if (
       savedLanguage &&
@@ -1569,21 +1431,6 @@ function App() {
   }, []);
 
   /*
-   * Synchronizes the spellcheck overlay's scroll position with the textarea.
-   */
-  function handleScroll(event) {
-    if (
-      spellcheckRef.current
-    ) {
-      spellcheckRef.current.scrollTop =
-        event.target.scrollTop;
-
-      spellcheckRef.current.scrollLeft =
-        event.target.scrollLeft;
-    }
-  }
-
-  /*
    * Changes language and automatically selects its first available
    * orthography.
    */
@@ -1616,9 +1463,11 @@ function App() {
    * ASCII-to-Unicode mappings.
    */
   function handleInput(event) {
-    setText(
-      event.target.value
-    );
+    const textarea = event.currentTarget;
+    const nextText = textarea.value;
+    const mappings = currentOrthography.mappings;
+
+    setText(nextText);
 
     if (!autoReplace) {
       return;
@@ -1626,8 +1475,8 @@ function App() {
 
     requestAnimationFrame(() => {
       applyMapping(
-        event.target,
-        currentOrthography.mappings,
+        textarea,
+        mappings,
         setText
       );
     });
@@ -1755,6 +1604,10 @@ function App() {
             </p>
           </div>
         </div>
+
+        <button className="home-link" onClick={onHome} type="button">
+          ← Home
+        </button>
 
         <div className="header-actions">
           <label className="select-wrap">
@@ -1885,19 +1738,6 @@ function App() {
           </div>
 
           <div className="editor-input-wrapper">
-            <div
-              ref={
-                spellcheckRef
-              }
-              className="spellcheck-layer"
-              aria-hidden="true"
-            >
-              {renderSpellcheckLayer(
-                text,
-                dictionarySet
-              )}
-            </div>
-
             <textarea
               ref={
                 textareaRef
@@ -1905,9 +1745,6 @@ function App() {
               value={text}
               onChange={
                 handleInput
-              }
-              onScroll={
-                handleScroll
               }
               placeholder={
                 `Start typing in ${language}…`
@@ -1930,21 +1767,23 @@ function App() {
               {currentOrthography.note}
             </span>
 
-            <span
-              className={
-                misspelledWords.length
-                  ? "spellcheck-warning"
-                  : "spellcheck-ok"
-              }
-            >
-              {misspelledWords.length
-                ? `${misspelledWords.length} word${
-                    misspelledWords.length === 1
-                      ? ""
-                      : "s"
-                  } not found`
-                : "✓ Dictionary check passed"}
-            </span>
+            {FEATURES.spellcheck && (
+              <span
+                className={
+                  misspelledWords.length
+                    ? "spellcheck-warning"
+                    : "spellcheck-ok"
+                }
+              >
+                {misspelledWords.length
+                  ? `${misspelledWords.length} word${
+                      misspelledWords.length === 1
+                        ? ""
+                        : "s"
+                    } not found`
+                  : "✓ Dictionary check passed"}
+              </span>
+            )}
           </div>
         </div>
 
@@ -2109,6 +1948,219 @@ function App() {
   );
 }
 
+const FALLING_GLYPHS = [
+  "ʔ", "ə", "š", "č", "ǰ", "ƛ", "ɬ", "x̣", "ḵ", "ʼ", "ł", "ƛʼ",
+  "k̓", "q̓", "t̓", "g̱", "x̱", "á", "à", "tɬ", "ʷ", "čʼ", "m̓"
+];
+
+function LandingPage({ onOpenEditor }) {
+  return (
+    <main className="landing-page">
+      <div className="falling-field" aria-hidden="true">
+        {Array.from({ length: 30 }, (_, index) => (
+          <span
+            className="falling-glyph"
+            key={index}
+            style={{
+              "--x": `${(index * 37 + 4) % 100}%`,
+              "--delay": `${-((index * 1.73) % 22)}s`,
+              "--duration": `${16 + (index * 7) % 15}s`,
+              "--size": `${18 + (index * 11) % 29}px`,
+              "--opacity": `${0.12 + ((index * 13) % 32) / 100}`
+            }}
+          >
+            {FALLING_GLYPHS[index % FALLING_GLYPHS.length]}
+          </span>
+        ))}
+      </div>
+
+      <header className="landing-nav">
+        <a className="landing-brand" href="#top" aria-label="CedarType home">
+          <span className="landing-mark" aria-hidden="true">
+            <svg viewBox="0 0 64 64">
+              <path d="M32 3 20 20h7L15 35h9L12 51h16v10h8V51h16L40 35h9L37 20h7L32 3Z" fill="currentColor" />
+            </svg>
+          </span>
+          <span>CedarType</span>
+        </a>
+        <a className="nav-github" href="https://github.com/SaharshSS/CedarType" target="_blank" rel="noreferrer" aria-label="CedarType on GitHub">
+          <GithubIcon />
+        </a>
+      </header>
+
+      <section className="landing-hero" id="top">
+        <div className="landing-copy">
+          <p className="landing-eyebrow"><span /> A keyboard for living languages</p>
+          <h1>Every language<br />deserves a <em>key.</em></h1>
+          <p className="landing-description">
+            CedarType makes it easier to write Pacific Northwest Indigenous languages—with the characters, spelling, and care they deserve.
+          </p>
+          <div className="landing-actions">
+            <button className="launch-button" type="button" onClick={onOpenEditor}>
+              Open CedarType <span aria-hidden="true">↗</span>
+            </button>
+            <button className="text-link" type="button" onClick={() => document.getElementById("downloads")?.scrollIntoView({ behavior: "smooth" })}>Get CedarType <span aria-hidden="true">↓</span></button>
+          </div>
+          <p className="landing-note">Free · Open source · Built for Unicode</p>
+        </div>
+
+        <PacificNorthwestMap />
+      </section>
+
+      <section className="language-strip" aria-label="Supported languages">
+        <span>MADE FOR</span>
+        <p>Lushootseed <i>·</i> Chinuk Wawa <i>·</i> Tlingit <i>·</i> Haida <i>·</i> Kwak̓wala <i>·</i> Nuu-chah-nulth</p>
+      </section>
+
+      <section className="download-section" id="downloads">
+        <div className="download-intro">
+          <p className="landing-eyebrow">TAKE IT WITH YOU</p>
+          <h2>One keyboard.<br /><em>More places to write.</em></h2>
+          <p>Choose the CedarType experience that fits the way you work.</p>
+        </div>
+        <div className="download-cards">
+          <article className="download-card">
+            <span className="platform-icon"><AppleIcon /></span>
+            <h3>For Mac</h3>
+            <p>Install the desktop input method and type across your Mac.</p>
+            <a href="https://github.com/SaharshSS/CedarType/releases/latest" target="_blank" rel="noreferrer"><AppleIcon /> View releases <span>↗</span></a>
+          </article>
+          <article className="download-card">
+            <span className="platform-icon"><WindowsIcon /></span>
+            <h3>For Windows</h3>
+            <p>Bring Indigenous language characters into your Windows workflow.</p>
+            <a href="https://github.com/SaharshSS/CedarType/releases/latest" target="_blank" rel="noreferrer"><WindowsIcon /> View releases <span>↗</span></a>
+          </article>
+          <article className="download-card">
+            <span className="platform-icon"><ChromeIcon /></span>
+            <h3>Chrome extension</h3>
+            <p>Compose with CedarType while you write across the web.</p>
+            <a href="https://github.com/SaharshSS/CedarType/releases/latest" target="_blank" rel="noreferrer"><ChromeIcon /> View releases <span>↗</span></a>
+          </article>
+        </div>
+        <p className="release-footnote">Desktop and browser downloads are shared through CedarType’s GitHub releases.</p>
+      </section>
+
+      <section className="roadmap-section" id="roadmap">
+        <div className="roadmap-heading">
+          <p className="landing-eyebrow">WHERE WE’RE GOING</p>
+          <h2>A roadmap for <em>what’s next.</em></h2>
+          <p>Built in the open, with community contributions guiding the way.</p>
+        </div>
+        <div className="roadmap-list">
+          {[
+            ["Multi-language support", true],
+            ["Multiple orthographies", true],
+            ["Unicode character palette", true],
+            ["Automatic character replacement", true],
+            ["Local settings persistence", true],
+            ["Expanded dictionaries", false],
+            ["Improved spellcheck suggestions", false],
+            ["Custom keyboard layouts", false],
+            ["Mobile optimization", false],
+            ["Additional Indigenous languages", false]
+          ].map(([item, done]) => (
+            <div className={`roadmap-item${done ? " is-done" : ""}`} key={item}>
+              <span className="roadmap-check" aria-hidden="true">{done ? "✓" : "→"}</span>
+              <span>{item}</span>
+              <small>{done ? "AVAILABLE" : "UP NEXT"}</small>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="thanks-section" id="thanks">
+        <div className="thanks-heading">
+          <div>
+            <p className="landing-eyebrow">WITH GRATITUDE</p>
+            <h2>Thanks to <em>our community.</em></h2>
+          </div>
+          <p>We’re grateful to the people and organizations who share their knowledge and support this work.</p>
+        </div>
+        {thanksImages.length ? (
+          <div className="thanks-gallery">
+            {thanksImages.map(({ src, name }) => (
+              <figure className="thanks-image" key={src}>
+                <img src={src} alt={name} />
+                <figcaption>{name}</figcaption>
+              </figure>
+            ))}
+          </div>
+        ) : (
+          <p className="thanks-empty">Add partner or supporter images to <code>src/assets/thanks/</code> to feature them here.</p>
+        )}
+      </section>
+
+      <footer className="landing-footer">
+        <a className="landing-brand" href="#top"><span className="landing-mark" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M32 3 20 20h7L15 35h9L12 51h16v10h8V51h16L40 35h9L37 20h7L32 3Z" fill="currentColor" /></svg></span><span>CedarType</span></a>
+        <p>Made with respect for the languages and communities who carry them.</p>
+        <a className="contact-link" href="https://github.com/SaharshSS/CedarType/issues" target="_blank" rel="noreferrer">Contact us <span>↗</span></a>
+      </footer>
+    </main>
+  );
+}
+
+function GithubIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.55.1.76-.24.76-.53v-2.07c-3.1.68-3.76-1.32-3.76-1.32-.5-1.3-1.23-1.65-1.23-1.65-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.16 1.71 1.16.99 1.7 2.6 1.21 3.23.92.1-.72.39-1.21.7-1.49-2.48-.28-5.09-1.24-5.09-5.53 0-1.22.44-2.22 1.16-3-.12-.28-.5-1.42.11-2.96 0 0 .95-.3 3.05 1.15a10.6 10.6 0 0 1 5.56 0c2.1-1.45 3.05-1.15 3.05-1.15.61 1.54.23 2.68.11 2.96.72.78 1.16 1.78 1.16 3 0 4.3-2.62 5.25-5.11 5.52.4.35.75 1.03.75 2.08V22c0 .29.2.64.77.53A11.1 11.1 0 0 0 12 .9Z" /></svg>;
+}
+
+function AppleIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.7 12.7c0-2.3 1.9-3.4 2-3.5a4.3 4.3 0 0 0-3.4-1.8c-1.4-.1-2.8.8-3.5.8-.7 0-1.8-.8-3-.8a4.5 4.5 0 0 0-3.8 2.3c-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.3 2.9 2.3 1.2-.1 1.7-.7 3.2-.7s2 .7 3.2.7c1.3 0 2.1-1.2 2.9-2.4a10.5 10.5 0 0 0 1.3-2.7 4.1 4.1 0 0 1-3-3.5ZM14.4 5.9A4.2 4.2 0 0 0 15.4 3a4.4 4.4 0 0 0-2.8 1.4 4 4 0 0 0-1 2.8 3.7 3.7 0 0 0 2.8-1.3Z" /></svg>;
+}
+
+function WindowsIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M2 4.9 10.9 3.7v8.1H2V4.9Zm10.1-1.3L22 2v9.8h-9.9V3.6ZM2 12.9h8.9V21L2 19.8v-6.9Zm10.1 0H22v9.8l-9.9-1.6v-8.2Z" /></svg>;
+}
+
+function ChromeIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#e9c94b"/><path fill="#519b57" d="M2.5 6.5A11 11 0 0 0 12 23l5-8.7H7.2L2.5 6.5Z"/><path fill="#d95d4f" d="M2.5 6.5A11 11 0 0 1 22 7H12l-4.8 8.3-4.7-8.8Z"/><circle cx="12" cy="12" r="4.3" fill="#f7f4e5"/><circle cx="12" cy="12" r="3.3" fill="#4d8ec9"/></svg>;
+}
+
+function PacificNorthwestMap() {
+  return (
+    <div className="pnw-map-card" aria-label="Stylized map of the Pacific Northwest">
+      <div className="map-topline"><span>CEDAR TYPE / FIELD NOTES</span><span>45° 32′ N — 122° 40′ W</span></div>
+      <svg className="pnw-map" viewBox="0 0 520 440" role="img" aria-labelledby="map-title map-description">
+        <title id="map-title">Pacific Northwest</title>
+        <desc id="map-description">A stylized map showing the Pacific coast, British Columbia, Washington, Oregon, and Idaho.</desc>
+        <defs>
+          <pattern id="map-dots" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".8" fill="#8a9d7b" opacity=".36" /></pattern>
+          <clipPath id="land-clip"><path d="M142 37 408 41 402 111 419 143 410 188 427 218 418 259 438 290 420 323 422 374 382 373 347 391 313 381 285 401 250 387 221 397 197 382 173 383 164 356 143 335 153 305 130 278 143 248 126 219 139 188 121 160 137 128 124 97Z" /></clipPath>
+        </defs>
+        <path className="map-water" d="M0 0h520v440H0z" />
+        <path className="map-land" d="M142 37 408 41 402 111 419 143 410 188 427 218 418 259 438 290 420 323 422 374 382 373 347 391 313 381 285 401 250 387 221 397 197 382 173 383 164 356 143 335 153 305 130 278 143 248 126 219 139 188 121 160 137 128 124 97Z" />
+        <path className="map-terrain" clipPath="url(#land-clip)" d="M110 25h350v395H110z" />
+        <path className="map-border" d="M127 160 405 161M141 248l276 1M168 335l255-1M288 40l-5 352" />
+        <path className="map-river" d="M322 78c-18 35-10 49-25 77s-5 36-29 59-8 45-27 66 2 40-29 77" />
+        <path className="map-river" d="M359 177c-23 17-48 16-64 37s-21 32-38 40" />
+        <path className="map-coast" d="m141 37-17 60 13 31-16 32 18 28-14 31 17 29-13 30 23 27-10 30 22 21 9 27 24 0" />
+        <path className="map-mountain" d="m282 179 16-30 12 30m-13-13 11 31 13-30m-25 16 12 30 13-29m-4 38 12-27 14 29m-41-3 12 30 13-27" />
+        <circle className="map-pin" cx="304" cy="252" r="5" /><circle className="map-pin-halo" cx="304" cy="252" r="13" />
+        <text className="map-city" x="320" y="256">CedarType</text>
+        <text className="map-label" x="207" y="113">BRITISH COLUMBIA</text>
+        <text className="map-label" x="191" y="213">WASHINGTON</text>
+        <text className="map-label" x="201" y="301">OREGON</text>
+        <text className="map-label" x="332" y="320">IDAHO</text>
+        <text className="map-water-label" x="51" y="240" transform="rotate(-78 51 240)">PACIFIC OCEAN</text>
+      </svg>
+      <div className="map-bottomline"><span>COASTAL HOMELANDS · CASCADES · INLAND WATERS</span><span>✳</span></div>
+    </div>
+  );
+}
+
+function App() {
+  const [showEditor, setShowEditor] = useState(false);
+  const openEditor = () => {
+    window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+    window.scrollTo(0, 0);
+    setShowEditor(true);
+  };
+
+  return showEditor
+    ? <EditorApp onHome={() => setShowEditor(false)} />
+    : <LandingPage onOpenEditor={openEditor} />;
+}
+
 /*
  * Mounts the CedarType React application into the root DOM element.
  */
@@ -2121,4 +2173,3 @@ createRoot(
     <App />
   </React.StrictMode>
 );
-
