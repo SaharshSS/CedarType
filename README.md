@@ -92,6 +92,382 @@ This allows users to type specialized characters using a standard English keyboa
 
 ---
 
+## Full Keystroke Reference
+
+Type each **Keys** sequence exactly as shown. CedarType inserts the matching
+**Output** for the selected language and orthography. Mappings are
+case-insensitive; starting a sequence with a capital letter capitalizes its
+output. Ordinary letters pass through unchanged. The desktop app's **Keystrokes**
+tab also lists direct letter keys for the currently selected profile.
+Each special character in the web app palette has a readable typing sequence
+where the orthography allows one (for example, `a'` → `á` and `a'a` → `áa`).
+
+### Lushootseed — Lushootseed Dictionary
+
+| Keys | Output |
+| --- | --- |
+| `'` | `ʔ` |
+| `;e` | `ə` |
+| `;l` | `ɫ` |
+| `;lh` | `ɬ` |
+| `b'` | `b̓` |
+| `c'` | `c̓` |
+| `ch` | `č` |
+| `ch'` | `č̓` |
+| `dz` | `dᶻ` |
+| `gw` | `gʷ` |
+| `j` | `ǰ` |
+| `k'` | `k̓` |
+| `kw` | `kʷ` |
+| `kw'` | `k̓ʷ` |
+| `l'` | `l̓` |
+| `lh` | `ł` |
+| `m'` | `m̓` |
+| `n'` | `n̓` |
+| `p'` | `p̓` |
+| `q'` | `q̓` |
+| `qw` | `qʷ` |
+| `qw'` | `q̓ʷ` |
+| `s'` | `s̓` |
+| `sh` | `š` |
+| `t'` | `t̓` |
+| `tl` | `ƛ` |
+| `tl'` | `ƛ̓` |
+| `w'` | `w̓` |
+| `xv` | `x̌` |
+| `xvw` | `x̌ʷ` |
+| `xw` | `xʷ` |
+| `y'` | `y̓` |
+
+### Chinuk Wawa — Grand Ronde
+
+| Keys | Output |
+| --- | --- |
+| `'` | `ʔ` |
+| `;e` | `ə` |
+| `a'` | `á` |
+| `ch'` | `c̓h` |
+| `e'` | `é` |
+| `i'` | `í` |
+| `k'` | `k̓` |
+| `kh` | `kʰ` |
+| `khw` | `kʰw` |
+| `kw'` | `k̓w` |
+| `lh` | `ɬ` |
+| `o'` | `ó` |
+| `p'` | `p̓` |
+| `ph` | `pʰ` |
+| `q'` | `q̓` |
+| `qh` | `qʰ` |
+| `qhw` | `qʰw` |
+| `qw'` | `q̓w` |
+| `t'` | `t̓` |
+| `th` | `tʰ` |
+| `tl` | `tɬ` |
+| `tl'` | `t̓ɬ` |
+| `ts'` | `t̓s` |
+| `u'` | `ú` |
+| `x.` | `x̣` |
+| `x.w` | `x̣w` |
+
+### Chinuk Wawa — Historical / Linguistic
+
+| Keys | Output |
+| --- | --- |
+| `'` | `ʔ` |
+| `;.` | `·` |
+| `;e` | `ə` |
+| `;p` | `′` |
+| `a'` | `á` |
+| `ae` | `æ` |
+| `e'` | `é` |
+| `i'` | `í` |
+| `k'` | `k̓` |
+| `kh` | `kʰ` |
+| `khw` | `kʰw` |
+| `kw'` | `k̓w` |
+| `lh` | `ɬ` |
+| `o'` | `ó` |
+| `p'` | `p̓` |
+| `ph` | `pʰ` |
+| `q'` | `q̓` |
+| `qh` | `qʰ` |
+| `qhw` | `qʰw` |
+| `qw'` | `q̓w` |
+| `t'` | `t̓` |
+| `th` | `tʰ` |
+| `tl` | `tɬ` |
+| `tl'` | `t̓ɬ` |
+| `u'` | `ú` |
+| `x.` | `x̣` |
+| `x.w` | `x̣w` |
+
+### Tlingit — Revised Popular
+
+| Keys | Output |
+| --- | --- |
+| `'` | `ʼ` |
+| `a'` | `á` |
+| `a'a` | `áa` |
+| ``a``` | `à` |
+| ``a`a`` | `àa` |
+| `e'` | `é` |
+| `e'e` | `ée` |
+| ``e``` | `è` |
+| ``e`e`` | `èe` |
+| `gh` | `g̱` |
+| `ghw` | `g̱w` |
+| `i'` | `í` |
+| `i'i` | `íi` |
+| ``i``` | `ì` |
+| ``i`i`` | `ìi` |
+| `k'` | `kʼ` |
+| `k'w` | `kʼw` |
+| `kh` | `ḵ` |
+| `kh'` | `ḵʼ` |
+| `kh'w` | `ḵʼw` |
+| `khw` | `ḵw` |
+| `l'` | `lʼ` |
+| `l_` | `ł` |
+| `o'` | `ó` |
+| `o'o` | `óo` |
+| ``o``` | `ò` |
+| ``o`o`` | `òo` |
+| `s'` | `sʼ` |
+| `t'` | `tʼ` |
+| `tl'` | `tlʼ` |
+| `ts'` | `tsʼ` |
+| `u'` | `ú` |
+| `u'u` | `úu` |
+| ``u``` | `ù` |
+| ``u`u`` | `ùu` |
+| `x'` | `xʼ` |
+| `x'w` | `xʼw` |
+| `xh` | `x̱` |
+| `xh'` | `x̱ʼ` |
+| `xh'w` | `x̱ʼw` |
+| `xhw` | `x̱w` |
+| `y:` | `ÿ` |
+
+### Tlingit — Canadian
+
+| Keys | Output |
+| --- | --- |
+| `'` | `ʼ` |
+| `a'` | `á` |
+| `a^` | `â` |
+| ``a``` | `à` |
+| `e'` | `é` |
+| `e^` | `ê` |
+| ``e``` | `è` |
+| `gh` | `gh` |
+| `ghw` | `ghw` |
+| `i'` | `í` |
+| `i^` | `î` |
+| ``i``` | `ì` |
+| `k'` | `kʼ` |
+| `k'w` | `kʼw` |
+| `kh'` | `khʼ` |
+| `kh'w` | `khʼw` |
+| `khw` | `khw` |
+| `l_` | `ł` |
+| `o'` | `ó` |
+| `o^` | `ô` |
+| ``o``` | `ò` |
+| `s'` | `sʼ` |
+| `t'` | `tʼ` |
+| `tl'` | `tlʼ` |
+| `ts'` | `tsʼ` |
+| `u'` | `ú` |
+| `u^` | `û` |
+| ``u``` | `ù` |
+| `x'` | `xʼ` |
+| `x'w` | `xʼw` |
+| `xh'` | `xhʼ` |
+| `xh'w` | `xhʼw` |
+| `xhw` | `xhw` |
+
+### Tlingit — Email
+
+| Keys | Output |
+| --- | --- |
+| `'` | `ʼ` |
+| `a'` | `á` |
+| `a'a` | `áa` |
+| ``a``` | `à` |
+| `e'` | `é` |
+| `e'e` | `ée` |
+| ``e``` | `è` |
+| `gh` | `gh` |
+| `ghw` | `ghw` |
+| `i'` | `í` |
+| `i'i` | `íi` |
+| ``i``` | `ì` |
+| `k'` | `kʼ` |
+| `k'w` | `kʼw` |
+| `kh'` | `khʼ` |
+| `kh'w` | `khʼw` |
+| `khw` | `khw` |
+| `l'` | `lʼ` |
+| `o'` | `ó` |
+| `o'o` | `óo` |
+| ``o``` | `ò` |
+| `s'` | `sʼ` |
+| `t'` | `tʼ` |
+| `tl'` | `tlʼ` |
+| `ts'` | `tsʼ` |
+| `u'` | `ú` |
+| `u'u` | `úu` |
+| ``u``` | `ù` |
+| `x'` | `xʼ` |
+| `x'w` | `xʼw` |
+| `xh'` | `xhʼ` |
+| `xh'w` | `xhʼw` |
+| `xhw` | `xhw` |
+
+### Haida — Enrico
+
+| Keys | Output |
+| --- | --- |
+| `'` | `ʼ` |
+| `a'` | `á` |
+| `a'a` | `áa` |
+| ``a``` | `à` |
+| ``a`a`` | `àa` |
+| `e'` | `é` |
+| `e'e` | `ée` |
+| ``e``` | `è` |
+| ``e`e`` | `èe` |
+| `i'` | `í` |
+| `i'i` | `íi` |
+| ``i``` | `ì` |
+| ``i`i`` | `ìi` |
+| `kh` | `ḵ` |
+| `kh'` | `ḵʼ` |
+| `o'` | `ó` |
+| `o'o` | `óo` |
+| ``o``` | `ò` |
+| ``o`o`` | `òo` |
+| `u'` | `ú` |
+| `u'u` | `úu` |
+| ``u``` | `ù` |
+| ``u`u`` | `ùu` |
+| `xh` | `x̱` |
+| `xh'` | `x̱ʼ` |
+
+### Haida — ANLC
+
+| Keys | Output |
+| --- | --- |
+| `'` | `ʼ` |
+| `a'` | `á` |
+| `a'a` | `áa` |
+| ``a``` | `à` |
+| ``a`a`` | `àa` |
+| `e'` | `é` |
+| `e'e` | `ée` |
+| ``e``` | `è` |
+| ``e`e`` | `èe` |
+| `i'` | `í` |
+| `i'i` | `íi` |
+| ``i``` | `ì` |
+| ``i`i`` | `ìi` |
+| `kh` | `ḵ` |
+| `kh'` | `ḵʼ` |
+| `o'` | `ó` |
+| `o'o` | `óo` |
+| ``o``` | `ò` |
+| ``o`o`` | `òo` |
+| `u'` | `ú` |
+| `u'u` | `úu` |
+| ``u``` | `ù` |
+| ``u`u`` | `ùu` |
+| `xh` | `x̱` |
+| `xh'` | `x̱ʼ` |
+
+### Kwak̓wala — U'mista
+
+| Keys | Output |
+| --- | --- |
+| `'` | `ʼ` |
+| `;e` | `ə` |
+| `a_` | `a̱` |
+| `ch` | `č` |
+| `gh` | `g̱` |
+| `ghw` | `g̱w` |
+| `k'` | `k̓` |
+| `k'w` | `k̓w` |
+| `kh` | `ḵ` |
+| `kh'` | `ḵ̓` |
+| `kh'w` | `ḵ̓w` |
+| `khw` | `ḵw` |
+| `lh` | `ł` |
+| `p'` | `p̓` |
+| `q'` | `q̓` |
+| `qw` | `qw` |
+| `qw'` | `q̓w` |
+| `sh` | `š` |
+| `t'` | `t̓` |
+| `tl` | `tł` |
+| `tl'` | `t̓ł` |
+| `ts'` | `t̓s` |
+| `xh` | `x̱` |
+| `xhw` | `x̱w` |
+| `xw` | `xw` |
+
+### Nuu-chah-nulth — Standard
+
+| Keys | Output |
+| --- | --- |
+| `'` | `ʔ` |
+| `;q` | `ʼ` |
+| `;w` | `ʷ` |
+| `a'` | `á` |
+| `ch` | `č` |
+| `ch'` | `c̓` |
+| `e'` | `é` |
+| `h.` | `ḥ` |
+| `i'` | `í` |
+| `l_` | `ł` |
+| `m'` | `m̓` |
+| `n'` | `n̓` |
+| `o'` | `ó` |
+| `p'` | `p̓` |
+| `q'` | `q̓` |
+| `sh` | `š` |
+| `t'` | `t̓` |
+| `tl` | `ƛ` |
+| `tl'` | `ƛ̓` |
+| `u'` | `ú` |
+| `w'` | `w̓` |
+| `x.` | `x̌` |
+
+### Nuu-chah-nulth — Bouchard
+
+| Keys | Output |
+| --- | --- |
+| `'` | `7` |
+| `;w` | `ʷ` |
+| `a'` | `á` |
+| `c'` | `cʼ` |
+| `ch` | `č` |
+| `ch'` | `čʼ` |
+| `e'` | `é` |
+| `h.` | `ẖ` |
+| `i'` | `í` |
+| `l_` | `ł` |
+| `m'` | `m̓` |
+| `n'` | `n̓` |
+| `o'` | `ó` |
+| `p'` | `pʼ` |
+| `q'` | `qʼ` |
+| `sh` | `š` |
+| `t'` | `tʼ` |
+| `tl` | `ƛ` |
+| `tl'` | `ƛʼ` |
+| `u'` | `ú` |
+| `w'` | `w̓` |
+
 ## Dictionary Spellcheck
 
 CedarType includes language-specific dictionary support for checking typed words against the selected language.

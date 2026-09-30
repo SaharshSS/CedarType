@@ -13,6 +13,7 @@ import {
   buildDictionarySet,
   getMisspelledWords
 } from "./features/spellcheck.jsx";
+import { addSpecialCharacterFallbacks } from "./features/add-special-character-fallbacks.js";
 
 const thanksImages = Object.entries(
   import.meta.glob("./assets/thanks/*.{png,jpg,jpeg,webp,gif,svg}", {
@@ -113,6 +114,8 @@ const LANGUAGE_PROFILES = {
           "č",
           "ǰ",
           "ł",
+          "ɫ",
+          "ɬ",
           "ƛ",
           "b̓",
           "c̓",
@@ -143,7 +146,9 @@ const LANGUAGE_PROFILES = {
           ch: "č",
           j: "ǰ",
           dz: "dᶻ",
+          gw: "gʷ",
           tl: "ƛ",
+          "tl'": "ƛ̓",
           "b'": "b̓",
           "c'": "c̓",
           "ch'": "č̓",
@@ -162,8 +167,12 @@ const LANGUAGE_PROFILES = {
           "w'": "w̓",
           xw: "xʷ",
           xv: "x̌",
-          "x̌w": "x̌ʷ",
+          xvw: "x̌ʷ",
+          lh: "ł",
+          ";l": "ɫ",
+          ";lh": "ɬ",
           "y'": "y̓",
+          ";e": "ə",
           "'": "ʔ"
         }
       }
@@ -265,6 +274,7 @@ const LANGUAGE_PROFILES = {
           lh: "ɬ",
           "x.": "x̣",
           "x.w": "x̣w",
+          ";e": "ə",
           "'": "ʔ"
         }
       },
@@ -347,6 +357,7 @@ const LANGUAGE_PROFILES = {
           lh: "ɬ",
           "x.": "x̣",
           "x.w": "x̣w",
+          ";e": "ə",
           "'": "ʔ"
         }
       }
@@ -825,6 +836,7 @@ const LANGUAGE_PROFILES = {
           xw: "xw",
           xhw: "x̱w",
           xh: "x̱",
+          ";e": "ə",
           "'": "ʼ"
         }
       }
@@ -965,6 +977,8 @@ const LANGUAGE_PROFILES = {
   }
 };
 
+addSpecialCharacterFallbacks(LANGUAGE_PROFILES);
+
 /*
  * Provides lightweight local example words for the suggestion UI.
  *
@@ -1098,7 +1112,8 @@ function insertAtCaret(
 function applyMapping(
   textarea,
   mapping,
-  setText
+  setText,
+  commitAmbiguous = false
 ) {
   if (!textarea) {
     return;
@@ -1113,6 +1128,8 @@ function applyMapping(
       start
     );
 
+  const normalizedBefore = before.toLocaleLowerCase();
+
   const after =
     textarea.value.slice(
       start
@@ -1126,25 +1143,39 @@ function applyMapping(
           a.length
       );
 
-  const match =
-    keys.find(
-      (key) =>
-        before.endsWith(key)
-    );
+  let match = keys.find((key) => normalizedBefore.endsWith(key));
+  let matchStart = match ? normalizedBefore.length - match.length : -1;
+  let preserveTrailingCharacter = false;
 
-  if (!match) {
+  if (!commitAmbiguous && match && keys.some((key) => key.length > match.length && key.startsWith(match))) {
+    // Wait for a possible longer sequence (for example, `ch` versus `ch'`).
     return;
   }
 
-  const replacement =
-    mapping[match];
+  if (!match && before.length > 1) {
+    const beforeLastCharacter = normalizedBefore.slice(0, -1);
+    const deferredMatch = keys.find((key) =>
+      beforeLastCharacter.endsWith(key) &&
+      keys.some((longerKey) => longerKey.length > key.length && longerKey.startsWith(key))
+    );
+    if (deferredMatch) {
+      match = deferredMatch;
+      matchStart = beforeLastCharacter.length - deferredMatch.length;
+      preserveTrailingCharacter = true;
+    }
+  }
+
+  if (!match) return;
+
+  let replacement = mapping[match];
+  if (/[A-Z]/.test(before[matchStart] ?? "")) {
+    replacement = replacement[0].toLocaleUpperCase() + replacement.slice(1);
+  }
 
   const next =
-    before.slice(
-      0,
-      -match.length
-    ) +
+    before.slice(0, matchStart) +
     replacement +
+    (preserveTrailingCharacter ? before.slice(-1) : "") +
     after;
 
   setText(next);
@@ -1152,10 +1183,7 @@ function applyMapping(
   requestAnimationFrame(() => {
     textarea.focus();
 
-    const position =
-      start -
-      match.length +
-      replacement.length;
+    const position = start - match.length + replacement.length + (preserveTrailingCharacter ? 1 : 0);
 
     textarea.setSelectionRange(
       position,
@@ -1234,6 +1262,7 @@ function EditorApp({ onHome }) {
 
   const textareaRef =
     useRef(null);
+  const mappingTimerRef = useRef(null);
 
   const profile =
     LANGUAGE_PROFILES[
@@ -1437,6 +1466,7 @@ function EditorApp({ onHome }) {
   function handleLanguageChange(
     nextLanguage
   ) {
+    clearTimeout(mappingTimerRef.current);
     setLanguage(
       nextLanguage
     );
@@ -1470,6 +1500,8 @@ function EditorApp({ onHome }) {
     setText(nextText);
 
     if (!autoReplace) {
+      clearTimeout(mappingTimerRef.current);
+      mappingTimerRef.current = null;
       return;
     }
 
@@ -1479,6 +1511,12 @@ function EditorApp({ onHome }) {
         mappings,
         setText
       );
+
+      clearTimeout(mappingTimerRef.current);
+      mappingTimerRef.current = setTimeout(() => {
+        applyMapping(textarea, mappings, setText, true);
+        mappingTimerRef.current = null;
+      }, 650);
     });
   }
 
@@ -1486,6 +1524,8 @@ function EditorApp({ onHome }) {
    * Inserts a suggestion at the current word position.
    */
   function useSuggestion(word) {
+    clearTimeout(mappingTimerRef.current);
+    mappingTimerRef.current = null;
     const textarea =
       textareaRef.current;
 
@@ -1549,6 +1589,8 @@ function EditorApp({ onHome }) {
    * Clears the current composition.
    */
   function clearText() {
+    clearTimeout(mappingTimerRef.current);
+    mappingTimerRef.current = null;
     setText("");
 
     requestAnimationFrame(() => {
