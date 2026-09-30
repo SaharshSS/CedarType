@@ -1,0 +1,111 @@
+:root {
+  color-scheme: light;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #173b30;
+  background: #f7f3e8;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  width: 320px;
+  margin: 0;
+  padding: 18px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 20px;
+}
+
+.brand img { border-radius: 11px; }
+.brand h1 { margin: 0; font-size: 18px; letter-spacing: -0.02em; }
+.brand p { margin: 3px 0 0; color: #5e746b; font-size: 12px; }
+
+.field-label {
+  display: block;
+  margin: 13px 0 6px;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+select {
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #ccd7cc;
+  border-radius: 9px;
+  background: #fffdf7;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding: 13px 0;
+  border-top: 1px solid #dbe1d7;
+  border-bottom: 1px solid #dbe1d7;
+}
+
+.toggle-row strong { font-size: 13px; }
+.toggle-row p { margin: 4px 0 0; color: #5e746b; font-size: 11px; }
+
+.switch { position: relative; display: inline-block; width: 42px; height: 24px; }
+.switch input { width: 1px; height: 1px; opacity: 0; }
+.slider {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  border-radius: 99px;
+  background: #aebbb0;
+  transition: background 150ms ease;
+}
+.slider::before {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  content: "";
+  transition: transform 150ms ease;
+}
+.switch input:checked + .slider { background: #28624c; }
+.switch input:checked + .slider::before { transform: translateX(18px); }
+.switch input:focus-visible + .slider { outline: 2px solid #174f3b; outline-offset: 2px; }
+
+.access-notice {
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid #d5a45b;
+  border-radius: 9px;
+  background: #fff5df;
+  color: #60441b;
+}
+.access-notice p { margin: 0 0 8px; font-size: 12px; line-height: 1.35; }
+.access-notice button {
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 7px;
+  background: #28624c;
+  color: white;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.access-notice button:disabled { opacity: 0.65; cursor: wait; }
+.access-notice[hidden] { display: none; }
+
+.hint {
+  margin: 14px 0 0;
+  color: #60746a;
+  font-size: 11px;
+  line-height: 1.45;
+}

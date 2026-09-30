@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CedarType</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <header class="brand">
+      <img src="icons/icon48.png" width="40" height="40" alt="">
+      <div>
+        <h1>CedarType</h1>
+        <p>Type language characters on the web</p>
+      </div>
+    </header>
+
+    <label class="field-label" for="language">Language</label>
+    <select id="language"></select>
+
+    <label class="field-label" for="orthography">Orthography</label>
+    <select id="orthography"></select>
+
+    <section class="toggle-row">
+      <div>
+        <strong>Enable typing</strong>
+        <p id="status">Loading profiles…</p>
+      </div>
+      <label class="switch" aria-label="Enable CedarType typing">
+        <input id="enabled" type="checkbox">
+        <span class="slider"></span>
+      </label>
+    </section>
+
+    <section id="site-access" class="access-notice" hidden>
+      <p>Chrome is blocking CedarType from webpage fields.</p>
+      <button id="grant-access" type="button">Allow access on websites</button>
+    </section>
+
+    <p class="hint">Type a profile’s shortcut in a website text field. CedarType works on webpages, not browser settings pages or other desktop apps.</p>
+    <script src="popup.js"></script>
+  </body>
+</html>
