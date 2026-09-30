@@ -489,6 +489,13 @@ Clicking a character inserts it directly into the editor.
 
 ---
 
+## Desktop Apps
+
+- [macOS app](mac-app/README.md)
+- [Windows app](windows-app/README.md)
+
+---
+
 ## 🛠️ Quick Start
 
 ### Prerequisites

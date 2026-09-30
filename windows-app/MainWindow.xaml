@@ -1,0 +1,69 @@
+<Window x:Class="CedarType.Windows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="CedarType" Height="620" Width="650" MinHeight="560" MinWidth="560"
+        Background="{StaticResource PaperBrush}" Foreground="{StaticResource ForestDarkBrush}"
+        WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+  <Grid Margin="28">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <StackPanel Grid.Row="0" Margin="0,0,0,18">
+      <TextBlock Text="CedarType" FontSize="26" FontWeight="Bold" />
+      <TextBlock Text="Type Indigenous language characters in any Windows app."
+                 Margin="0,4,0,0" Foreground="{StaticResource MutedBrush}" FontSize="13" />
+    </StackPanel>
+
+    <Grid Grid.Row="1" Margin="0,0,0,14">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="130"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+      <TextBlock Text="Language" VerticalAlignment="Center" FontWeight="SemiBold" />
+      <ComboBox x:Name="LanguagePicker" Grid.Column="1" SelectionChanged="LanguagePicker_SelectionChanged" />
+    </Grid>
+
+    <Grid Grid.Row="2" Margin="0,0,0,18">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="130"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+      <TextBlock Text="Orthography" VerticalAlignment="Center" FontWeight="SemiBold" />
+      <ComboBox x:Name="OrthographyPicker" Grid.Column="1" SelectionChanged="OrthographyPicker_SelectionChanged" />
+    </Grid>
+
+    <TabControl x:Name="MainTabs" Grid.Row="3" Background="Transparent" BorderBrush="#D9E0D5">
+      <TabItem Header="Typing">
+        <StackPanel Margin="16" VerticalAlignment="Top">
+          <Button x:Name="ToggleButton" Content="Turn CedarType On" HorizontalAlignment="Left"
+                  Click="ToggleButton_Click" Padding="18,10" />
+          <TextBlock x:Name="StatusText" Text="Typing is off" Margin="0,14,0,0" TextWrapping="Wrap"
+                     Foreground="{StaticResource MutedBrush}" />
+          <Border Margin="0,20,0,0" Padding="14" Background="#ECEBDD" CornerRadius="10">
+            <StackPanel>
+              <TextBlock Text="How it works" FontWeight="Bold" />
+              <TextBlock Text="Turn typing on, then type the shortcut sequences for the selected orthography in another app. Unmapped text passes through unchanged. Close this window to keep CedarType running in the system tray."
+                         Margin="0,7,0,0" TextWrapping="Wrap" Foreground="{StaticResource MutedBrush}" />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </TabItem>
+      <TabItem Header="Keystrokes" Selected="KeystrokesTab_Selected">
+        <DockPanel Margin="16">
+          <TextBlock DockPanel.Dock="Top" Text="Keys and outputs for the selected language and orthography"
+                     Margin="0,0,0,10" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" />
+          <ListView x:Name="KeystrokesList" BorderBrush="#D9E0D5" Background="#FFFCF5">
+            <ListView.View>
+              <GridView>
+                <GridViewColumn Header="Keys" Width="190" DisplayMemberBinding="{Binding Keys}" />
+                <GridViewColumn Header="Output" Width="150" DisplayMemberBinding="{Binding Output}" />
+              </GridView>
+            </ListView.View>
+          </ListView>
+        </DockPanel>
+      </TabItem>
+    </TabControl>
+
+    <TextBlock Grid.Row="4" Text="CedarType stays in the system tray when this window is closed."
+               Margin="0,14,0,0" FontSize="11" Foreground="{StaticResource MutedBrush}" />
+  </Grid>
+</Window>

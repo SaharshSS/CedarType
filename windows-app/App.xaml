@@ -1,0 +1,28 @@
+<Application x:Class="CedarType.Windows.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnExplicitShutdown">
+  <Application.Resources>
+    <Color x:Key="Forest">#28624C</Color>
+    <Color x:Key="ForestDark">#173B30</Color>
+    <Color x:Key="Paper">#F7F3E8</Color>
+    <Color x:Key="Muted">#60746A</Color>
+    <SolidColorBrush x:Key="ForestBrush" Color="{StaticResource Forest}" />
+    <SolidColorBrush x:Key="ForestDarkBrush" Color="{StaticResource ForestDark}" />
+    <SolidColorBrush x:Key="PaperBrush" Color="{StaticResource Paper}" />
+    <SolidColorBrush x:Key="MutedBrush" Color="{StaticResource Muted}" />
+    <Style TargetType="Button">
+      <Setter Property="Padding" Value="14,8" />
+      <Setter Property="Background" Value="{StaticResource ForestBrush}" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style TargetType="ComboBox">
+      <Setter Property="Padding" Value="8,6" />
+      <Setter Property="MinWidth" Value="260" />
+      <Setter Property="Background" Value="White" />
+    </Style>
+  </Application.Resources>
+</Application>
